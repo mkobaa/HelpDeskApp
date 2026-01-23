@@ -1,0 +1,11 @@
+` technician name isnt visible in user / technician tickets page must be fixed ASAP`
+* pending assignement must showm it must not be not assigned, must show the pending technician name in a different color
+`after the technician accpets a ticket a notification must be sent to the supervisor and the user that the ticket status changed from open to in_progress`
+`admin must be able to deactivate accounts` 
+* we must have `priorities` and `statuses` tables and link them with tickets
+* technician must be able to `reassign tickets to other technicians` the `supervisor must approve this action`
+* ticket history notes are implemented incorrectly, it must be added by technicians like howa they solved the ticket
+`a time tracking table must exist`
+* Manual entry of time spent if needed.
+* Reports on time spent per ticket.
+* must implement surveys
