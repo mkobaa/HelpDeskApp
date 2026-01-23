@@ -22,7 +22,6 @@ This project is built with a focus on clean architecture, separation of concerns
 
 ## 🛠️ Technologies
 
-> Update this section with your actual stack.
 
 - Backend: Laravel / PHP  
 - Frontend: Vue / Nuxt  
