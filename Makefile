@@ -6,6 +6,8 @@ DC = docker compose
 
 .PHONY: build-prod
 
+.PHONY: compose-prod-up compose-prod-up-d compose-prod-down compose-prod-build
+
 ## Build images
 build:
 	$(DC) build
@@ -58,3 +60,21 @@ re :
 	$(MAKE) down
 	$(MAKE) build
 	$(MAKE) up
+
+
+## Production compose targets (use docker-compose.prod.yml)
+compose-prod-up:
+	# Build and run production compose (foreground)
+	docker compose -f docker-compose.prod.yml up --build
+
+compose-prod-up-d:
+	# Build and run production compose (detached)
+	docker compose -f docker-compose.prod.yml up --build -d
+
+compose-prod-down:
+	# Stop and remove production compose services
+	docker compose -f docker-compose.prod.yml down
+
+compose-prod-build:
+	# Build only the production compose images
+	docker compose -f docker-compose.prod.yml build --no-cache

@@ -36,19 +36,30 @@ class NotificationController extends Controller
 
     public function sseNotifications(Request $request)
     {
-        // Prefer session-authenticated user, otherwise accept Bearer token (Sanctum)
         $user = $request->user();
+
+        if (!$user) {
+            $token = $request->query('token');
+
+            if ($token) {
+                try {
+                    $pat = PersonalAccessToken::findToken($token);
+                    if ($pat) {
+                        $user = $pat->tokenable;
+                    }
+                } catch (\Throwable $e) {}
+            }
+        }
 
         if (!$user) {
             $authHeader = $request->header('Authorization', '') ?: $request->server('HTTP_AUTHORIZATION', '');
             if (preg_match('/Bearer\s+(.+)/', $authHeader, $m)) {
-                $token = $m[1];
                 try {
-                    $pat = PersonalAccessToken::findToken($token);
-                    if ($pat) $user = $pat->tokenable;
-                } catch (\Throwable $e) {
-                    // ignore
-                }
+                    $pat = PersonalAccessToken::findToken($m[1]);
+                    if ($pat) {
+                        $user = $pat->tokenable;
+                    }
+                } catch (\Throwable $e) {}
             }
         }
 
@@ -56,23 +67,41 @@ class NotificationController extends Controller
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
-        $lastId = (int) ($request->header('Last-Event-ID') ?? 0);
+        $lastTime = $request->header('Last-Event-ID');
 
-        return response()->stream(function () use ($user, &$lastId) {
+        return response()->stream(function () use ($user, &$lastTime) {
+
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+
+            ob_implicit_flush(true);
+            ini_set('output_buffering', 'off');
+            ini_set('zlib.output_compression', 'off');
             set_time_limit(0);
             ignore_user_abort(true);
 
-            // Keep the loop running until client disconnects or an error occurs
+            echo "event: connected\n";
+            echo "data: ok\n\n";
+            flush();
+
             while (!connection_aborted()) {
                 try {
-                    $notifications = $user->unreadNotifications()
-                        ->where('id', '>', $lastId)
-                        ->orderBy('id')
+                    $query = $user->unreadNotifications();
+
+                    if ($lastTime && is_numeric($lastTime)) {
+                        $query->where('created_at', '>', \Carbon\Carbon::createFromTimestamp((int) $lastTime));
+                    }
+
+                    $notifications = $query
+                        ->orderBy('created_at')
                         ->get();
 
                     if ($notifications->isNotEmpty()) {
                         foreach ($notifications as $notification) {
-                            echo "id: {$notification->id}\n";
+                            $id = $notification->created_at->timestamp;
+
+                            echo "id: {$id}\n";
                             echo "event: notification\n";
                             echo "data: " . json_encode([
                                 'id' => $notification->id,
@@ -81,46 +110,37 @@ class NotificationController extends Controller
                                 'created_at' => $notification->created_at,
                             ]) . "\n\n";
 
-                            $lastId = $notification->id;
+                            $lastTime = $id;
                         }
 
-                        ob_flush();
                         flush();
                     } else {
-                        // send a comment heartbeat to keep connection alive per SSE spec
                         echo ": heartbeat\n\n";
-                        ob_flush();
                         flush();
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     echo "event: error\n";
                     echo "data: " . json_encode(['message' => 'SSE stream error']) . "\n\n";
-                    ob_flush();
                     flush();
                     break;
                 }
 
-                // release DB connections periodically to avoid exhausting worker resources
                 try {
                     \DB::disconnect();
-                } catch (\Throwable $e) {
-                    // ignore DB disconnect errors
-                }
+                } catch (\Throwable $e) {}
 
-                // sleep to avoid tight loop and CPU hogging
-                usleep(1000000); // 1 second
+                usleep(1000000);
             }
         }, 200, [
             'Content-Type' => 'text/event-stream',
             'Cache-Control' => 'no-cache',
             'Connection' => 'keep-alive',
-            // advise proxies not to buffer
             'X-Accel-Buffering' => 'no',
-            // CORS headers for SSE - critical for cross-origin EventSource
             'Access-Control-Allow-Origin' => 'http://localhost:3000',
-            'Access-Control-Allow-Credentials' => 'true',
-            'Access-Control-Expose-Headers' => 'Content-Type, Cache-Control, X-Accel-Buffering',
+            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization, Last-Event-ID',
         ]);
     }
+
 
 }
