@@ -10,6 +10,8 @@ defineProps<{
   icon?: string
 }>()
 
+
+
 type NotificationItem = {
   id: string | number
   title: string
