@@ -65,6 +65,7 @@ declare global {
   const markRaw: typeof import('../../node_modules/vue').markRaw
   const navigateTo: typeof import('../../node_modules/nuxt/dist/app/composables/router').navigateTo
   const nextTick: typeof import('../../node_modules/vue').nextTick
+  const notifications: typeof import('../../app/utils/notifications').default
   const onActivated: typeof import('../../node_modules/vue').onActivated
   const onBeforeMount: typeof import('../../node_modules/vue').onBeforeMount
   const onBeforeRouteLeave: typeof import('../../node_modules/vue-router').onBeforeRouteLeave
@@ -106,6 +107,8 @@ declare global {
   const shallowReadonly: typeof import('../../node_modules/vue').shallowReadonly
   const shallowRef: typeof import('../../node_modules/vue').shallowRef
   const showError: typeof import('../../node_modules/nuxt/dist/app/composables/error').showError
+  const startSSE: typeof import('../../app/utils/notifications').startSSE
+  const stopSSE: typeof import('../../app/utils/notifications').stopSSE
   const toRaw: typeof import('../../node_modules/vue').toRaw
   const toRef: typeof import('../../node_modules/vue').toRef
   const toRefs: typeof import('../../node_modules/vue').toRefs
@@ -286,6 +289,7 @@ declare module 'vue' {
     readonly markRaw: UnwrapRef<typeof import('../../node_modules/vue')['markRaw']>
     readonly navigateTo: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/router')['navigateTo']>
     readonly nextTick: UnwrapRef<typeof import('../../node_modules/vue')['nextTick']>
+    readonly notifications: UnwrapRef<typeof import('../../app/utils/notifications')['default']>
     readonly onActivated: UnwrapRef<typeof import('../../node_modules/vue')['onActivated']>
     readonly onBeforeMount: UnwrapRef<typeof import('../../node_modules/vue')['onBeforeMount']>
     readonly onBeforeRouteLeave: UnwrapRef<typeof import('../../node_modules/vue-router')['onBeforeRouteLeave']>
@@ -327,6 +331,8 @@ declare module 'vue' {
     readonly shallowReadonly: UnwrapRef<typeof import('../../node_modules/vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('../../node_modules/vue')['shallowRef']>
     readonly showError: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/error')['showError']>
+    readonly startSSE: UnwrapRef<typeof import('../../app/utils/notifications')['startSSE']>
+    readonly stopSSE: UnwrapRef<typeof import('../../app/utils/notifications')['stopSSE']>
     readonly toRaw: UnwrapRef<typeof import('../../node_modules/vue')['toRaw']>
     readonly toRef: UnwrapRef<typeof import('../../node_modules/vue')['toRef']>
     readonly toRefs: UnwrapRef<typeof import('../../node_modules/vue')['toRefs']>

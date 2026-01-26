@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class comment extends Model
+class Comment extends Model
 {
     protected $fillable = ['ticket_id', 'user_id', 'content', 'is_user_visible'];
     public function user()

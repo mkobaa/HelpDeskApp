@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { getTicketById } from '~/api/tickets/tickets'
 import { updateTicketStatus } from '~/api/tickets/updateTicketStatus'
-import { getTechnicians } from '~/api/users/users'
 
 const route = useRoute()
 const ticketId = computed(() => route.params.id as string)
@@ -25,11 +24,6 @@ const { data: ticket, status, refresh, error } = await useAsyncData(
   }
 )
 
-const { data: users, error: usersError, status: usersStatus } = await useAsyncData('technicians', () => getTechnicians(), {
-  server: false,
-  lazy: true,
-  default: () => []
-})
 
 
 
@@ -72,16 +66,7 @@ const assignedTechnician = computed(() => {
   return (users.value || []).find(u => u.id == techId)
 })
 
-const technicianDisplayName = computed(() => {
-  return (
-    assignedTechnician.value?.username
-    || assignedTechnician.value?.email
-    || ticket.value?.technician?.username
-    || ticket.value?.technician?.name
-    || ticket.value?.technician_name
-    || 'Unassigned'
-  )
-})
+
 
 const elapsedTime = ref('')
 let timerInterval: NodeJS.Timeout | null = null
@@ -279,6 +264,8 @@ onNuxtReady(() => {
             </div>
           </template>
         </UCard>
+        <TicketComments :ticket-id="ticketId" />
+
 
         <UAlert
           v-if="error"

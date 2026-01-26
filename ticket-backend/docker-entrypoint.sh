@@ -12,6 +12,7 @@ echo "Database is reachable"
 
 # Run migrations and seed demo data (safe to run multiple times)
 # Allow migrate to fail or return non-zero without stopping the script
+cp .env.example .env
 php artisan migrate --force || echo "php artisan migrate failed or had nothing to run; continuing"
 php artisan db:seed --class=DemoTicketSeeder || true
 

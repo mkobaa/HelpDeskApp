@@ -54,15 +54,24 @@ class CommentsController extends Controller
             'is_user_visible' => 'sometimes|boolean',
         ]);
         $superVisors = User::where('role', 'supervisor')->get();
-        $technicianToNotify = Ticket::find($ticketId)->assignedTech;
-        $userToNotify = Ticket::find($ticketId)->submitter;
+        $ticket = Ticket::findOrFail($ticketId);
+        $technicianToNotify = $ticket->assignedTech;
+        $userToNotify = $ticket->submitter;
 
+        // Enforce that only supervisors and technicians may set `is_user_visible`.
+        $role = $request->user()->role ?? null;
+        if ($role === 'supervisor' || $role === 'technician') {
+            $isUserVisible = $comments['is_user_visible'] ?? true;
+        } else {
+            // Regular users cannot override visibility; comments they create are visible to users.
+            $isUserVisible = true;
+        }
 
         $comment = Comment::create([
             'ticket_id' => $ticketId,
             'user_id' => $request->user()->id,
             'content' => $comments['content'],
-            'is_user_visible' => $comments['is_user_visible'] ?? true,
+            'is_user_visible' => $isUserVisible,
         ]);
 
 
@@ -76,8 +85,8 @@ class CommentsController extends Controller
                 $supervisor->notify(new CommentAddedToTicket($comment, $ticketId));
         }
 
-        if ($technicianToNotify && $technicianToNotify->id == $request->user()->id) {
-                $technicianToNotify->notify(new CommentAddedToTicket($comment, $ticketId));
+        if ($technicianToNotify && $technicianToNotify->id != $request->user()->id) {
+            $technicianToNotify->notify(new CommentAddedToTicket($comment, $ticketId));
         }
 
 

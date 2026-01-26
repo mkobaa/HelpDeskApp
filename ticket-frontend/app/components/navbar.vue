@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, computed } from 'vue'
-import { fetchNotifications, markNotificationRead, markAllNotificationsRead } from '~/utils/notifications'
+import { getProfile } from '~/api/users/profile'
+import { fetchNotifications, markNotificationRead, markAllNotificationsRead, startSSE, stopSSE } from '~/utils/notifications'
 import getAssignedToMe from '~/api/tickets/acceptTicket'
 import { accept as acceptAssignment, reject as rejectAssignment } from '~/api/tickets/acceptance'
 
@@ -41,7 +42,7 @@ const mapApiNotifications = (payload: any): NotificationItem[] => {
   return items.map((item: any) => ({
     id: item.id ?? crypto.randomUUID(),
     title: item.type?.split('\\').pop() || 'Notification',
-    description: item.data?.message || 'New update',
+    description: item.data?.message || item.data?.message || 'New update',
     time: item.created_at ? formatTimeAgo(item.created_at) : 'Just now',
     unread: !item.read_at
   }))
@@ -58,23 +59,6 @@ const loadNotifications = async () => {
     isLoading.value = false
   }
 }
-
-onMounted(() => {
-  loadNotifications()
-  // simple polling to keep notifications near real-time
-  pollTimer = setInterval(loadNotifications, 10000)
-  // load assigned ticket for technicians
-  if (useCookie('user_role').value === 'technician') {
-    loadAssigned()
-    assignedTimer = setInterval(loadAssigned, 10000)
-  }
-  // load surveys for users
-  if (useCookie('user_role').value === 'user') {
-    loadMySurveys()
-    mySurveysTimer = setInterval(loadMySurveys, 10000)
-  }
-})
-
 
 const handleNotificationClick = async (notification) => {
   if (!notification.unread) return
@@ -93,6 +77,50 @@ const handleMarkAllRead = async () => {
     console.error('Failed to mark all notifications as read', err)
   }
 }
+
+
+
+
+onMounted(async () => {
+  // sync role cookie with server-side user role
+  try {
+    const raw = await getProfile()
+    const serverRole = raw?.data?.role
+    if (serverRole) {
+      const cookieUserRole = useCookie('user_role')
+      if (cookieUserRole.value !== serverRole) cookieUserRole.value = serverRole
+    }
+  } catch (err) {
+    // ignore if not authenticated or request fails
+  }
+  // load notifications once and start SSE for real-time updates
+  await loadNotifications()
+  startSSE({
+    onMessage(payload) {
+      try {
+        const mapped = mapApiNotifications({ data: [payload] })[0]
+        notifications.value = [mapped, ...notifications.value].slice(0, 50)
+      } catch (e) {
+        // ignore
+      }
+    },
+    onError(err) {
+      console.error('SSE error', err)
+    }
+  })
+
+  if (useCookie('user_role').value === 'technician') {
+    loadAssigned()
+    assignedTimer = setInterval(loadAssigned, 10000)
+  }
+  // load surveys for users
+  if (useCookie('user_role').value === 'user') {
+    loadMySurveys()
+    mySurveysTimer = setInterval(loadMySurveys, 10000)
+  }
+})
+
+
 
 // Assigned-to-me banner logic (technician only)
 const assigned = ref(null)
@@ -167,6 +195,7 @@ onBeforeUnmount(() => {
   if (pollTimer) clearInterval(pollTimer)
   if (assignedTimer) clearInterval(assignedTimer)
   if (mySurveysTimer) clearInterval(mySurveysTimer)
+  try { stopSSE() } catch (e) {}
 })
 </script>
 <template>

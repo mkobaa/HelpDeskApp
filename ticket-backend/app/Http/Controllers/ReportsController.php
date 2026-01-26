@@ -89,10 +89,12 @@ class ReportsController extends Controller
 
         $averageSatisfaction = $query->avg('satisfaction_rating');
 
+        $avg = $averageSatisfaction === null ? null : round($averageSatisfaction, 2);
+
         return response()->json([
             'success' => true,
             'data' => [
-                'average_satisfaction_rating' => round($averageSatisfaction, 2)
+                'average_satisfaction_rating' => $avg
             ]
         ]);
     }
@@ -156,4 +158,10 @@ class ReportsController extends Controller
             'values' => $values
         ]);
     }
+
+
+    // public function exportReport(Request $request)
+    // {
+    //     $tic
+    // }
 }

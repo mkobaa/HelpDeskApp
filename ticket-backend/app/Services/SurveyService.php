@@ -49,7 +49,7 @@ class SurveyService
             $survey->response_time_rating = (int) $data['response_time_rating'];
             $survey->resolution_quality_rating = (int) $data['resolution_quality_rating'];
             $survey->comments = $comments;
-            $ticket->save();
+            $survey->save();
         } else {
             $survey = Survey::create([
                 'ticket_id' => $ticket->id,
