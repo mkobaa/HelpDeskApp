@@ -7,45 +7,21 @@ use App\Models\Ticket;
 use App\Models\TicketHistory;
 use App\Services\TicketHistoryService;
 use App\Notifications\TicketAssigned;
-use App\Notifications\StatusUpdated;
 use App\Models\User;
 use App\Models\Attachment;
 use Illuminate\Support\Facades\DB;
 use App\Models\TicketAcceptance;
-use App\Models\TimeTracking;
 use function Symfony\Component\Clock\now;
 use App\Services\TicketService;
+use App\Services\TicketManagementService;
 
 class TicketsController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, TicketManagementService $ticketManagementService)
     {
         $user = $request->user();
 
-        if ($user->role === 'user')
-        {
-            $tickets = Ticket::with(['category', 'attachments'])
-            ->where('submitter_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-        }
-        else if ($user->role === 'technician')
-        {
-            $tickets = Ticket::with('attachments')
-            ->where('assigned_tech_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-        }
-        else if ($user->role === 'supervisor')
-        {
-            $tickets = Ticket::with(['category', 'attachments'])
-            ->when($request->status, fn($q) => $q->where('status', $request->status))
-            ->when($request->priority, fn($q) => $q->where('priority', $request->priority))
-            ->when($request->category_id, fn($q) => $q->where('category_id', $request->category_id))
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
-        }
-
+        $tickets = $ticketManagementService->getTickets($user, $request);
 
         return response()->json([
             'success' => true,

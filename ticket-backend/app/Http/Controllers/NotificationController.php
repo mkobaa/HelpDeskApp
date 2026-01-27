@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Redis;
+use App\Services\SseAuthResolver;
+use App\Services\NotificationStreamService;
 
 class NotificationController extends Controller
 {
@@ -37,32 +39,7 @@ class NotificationController extends Controller
 
     public function sseNotifications(Request $request)
     {
-        $user = $request->user();
-
-        if (!$user) {
-            $token = $request->query('token');
-
-            if ($token) {
-                try {
-                    $pat = PersonalAccessToken::findToken($token);
-                    if ($pat) {
-                        $user = $pat->tokenable;
-                    }
-                } catch (\Throwable $e) {}
-            }
-        }
-
-        if (!$user) {
-            $authHeader = $request->header('Authorization', '') ?: $request->server('HTTP_AUTHORIZATION', '');
-            if (preg_match('/Bearer\s+(.+)/', $authHeader, $m)) {
-                try {
-                    $pat = PersonalAccessToken::findToken($m[1]);
-                    if ($pat) {
-                        $user = $pat->tokenable;
-                    }
-                } catch (\Throwable $e) {}
-            }
-        }
+        $user = (new SseAuthResolver())->resolve($request);
 
         if (!$user) {
             return response()->json(['message' => 'Unauthenticated'], 401);
@@ -71,78 +48,7 @@ class NotificationController extends Controller
         $lastTime = $request->header('Last-Event-ID');
 
         return response()->stream(function () use ($user, &$lastTime) {
-
-            while (ob_get_level() > 0) {
-                ob_end_flush();
-            }
-
-            ob_implicit_flush(true);
-            ini_set('output_buffering', 'off');
-            ini_set('zlib.output_compression', 'off');
-            set_time_limit(0);
-            ignore_user_abort(true);
-
-            echo "event: connected\n";
-            echo "data: ok\n\n";
-            flush();
-
-            // Send initial unread notifications once (DB used only for persistence + initial fetch)
-            try {
-                $query = $user->unreadNotifications();
-
-                if ($lastTime && is_numeric($lastTime)) {
-                    $query->where('created_at', '>', \Carbon\Carbon::createFromTimestamp((int) $lastTime));
-                }
-
-                $notifications = $query->orderBy('created_at')->get();
-
-                if ($notifications->isNotEmpty()) {
-                    foreach ($notifications as $notification) {
-                        $id = $notification->created_at->timestamp;
-
-                        echo "id: {$id}\n";
-                        echo "event: notification\n";
-                        echo "data: " . json_encode([
-                            'id' => $notification->id,
-                            'type' => $notification->type,
-                            'data' => $notification->data,
-                            'created_at' => $notification->created_at,
-                        ]) . "\n\n";
-
-                        $lastTime = $id;
-                    }
-
-                    flush();
-                }
-            } catch (\Throwable $e) {
-                // If initial DB fetch fails, continue to Redis subscription for realtime updates
-            }
-
-            // Subscribe to Redis Pub/Sub for realtime notifications
-            $channel = sprintf('notifications:%s', $user->id);
-
-            try {
-                Redis::subscribe([$channel], function ($message) {
-                    if (connection_aborted()) {
-                        // Let the subscribe call end when connection is gone
-                        exit;
-                    }
-
-                    $payload = $message;
-
-                    if (is_array($message) && isset($message['payload'])) {
-                        $payload = $message['payload'];
-                    }
-
-                    echo "event: notification\n";
-                    echo "data: {$payload}\n\n";
-                    flush();
-                });
-            } catch (\Throwable $e) {
-                echo "event: error\n";
-                echo "data: " . json_encode(['message' => 'Redis subscribe failed']) . "\n\n";
-                flush();
-            }
+            (new NotificationStreamService())->stream($user, $lastTime);
 
         }, 200, [
                 'Content-Type' => 'text/event-stream',

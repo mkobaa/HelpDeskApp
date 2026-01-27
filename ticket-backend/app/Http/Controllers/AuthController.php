@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\AuthService;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -16,22 +17,11 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+        $user = AuthService::authenticate($request);
+        if (AuthService::checkUserStatus($user)) {
+            return AuthService::checkUserStatus($user);
         }
-
-        if (!$user->is_active) {
-            return response()->json([
-                'message' => 'Your account is deactivated. Please contact the administrator.'
-            ], 403);
-        }
-
-        $user->tokens()->where('name', 'api-token')->delete();
-        $token = $user->createToken('api-token')->plainTextToken;
+        $token = AuthService::generateToken($user);
 
 
         return response()->json([

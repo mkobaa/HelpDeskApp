@@ -105,4 +105,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/export', [ReportsController::class, 'exportReport'])->middleware('supervisor');
 });
 
-Route::get('/sse/notifications', [NotificationController::class, 'sseNotifications']);
+// Route::get('/sse/notifications', [NotificationController::class, 'sseNotifications']);
