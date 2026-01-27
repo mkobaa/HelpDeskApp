@@ -53,14 +53,6 @@ onNuxtReady(() => {
         Profile
       </UButton>
 
-      <UButton
-        size="xs"
-        color="primary"
-        icon="i-lucide-pencil"
-        :to="`/admin/users/${row.original.id}/edit`"
-      >
-        Modify
-      </UButton>
     </div>
   </template>
 </UTable>

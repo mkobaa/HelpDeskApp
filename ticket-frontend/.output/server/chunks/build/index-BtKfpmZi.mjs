@@ -1,0 +1,934 @@
+import { _ as _sfc_main$e, a as __nuxt_component_1, b as __nuxt_component_2 } from './navbar-DByaTdfk.mjs';
+import { b as _sfc_main$5 } from './usePortal-BKdXuyUd.mjs';
+import { defineComponent, ref, computed, resolveComponent, withCtx, createVNode, mergeProps, createTextVNode, watch, createBlock, createCommentVNode, withDirectives, vModelSelect, openBlock, vModelText, Fragment, renderList, toDisplayString, unref, useSSRContext } from 'vue';
+import { ssrRenderComponent, ssrRenderAttrs, ssrIncludeBooleanAttr, ssrLooseContain, ssrLooseEqual, ssrRenderAttr, ssrRenderList, ssrInterpolate, ssrRenderStyle } from 'vue/server-renderer';
+import { _ as _sfc_main$6 } from './Card-o7xn3WFg.mjs';
+import { Line } from 'vue-chartjs';
+import { Chart, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
+import { b as useCookie } from './server.mjs';
+import 'reka-ui';
+import '../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import '@iconify/utils';
+import 'consola';
+import '@vueuse/core';
+import 'vaul-vue';
+import 'reka-ui/namespaced';
+import './nuxt-link-Bj7IzWuU.mjs';
+import 'tailwind-variants';
+import './index-Db0gMLsE.mjs';
+import '@iconify/vue';
+import '@iconify/utils/lib/css/icon';
+import 'perfect-debounce';
+import 'vue-router';
+import 'tailwindcss/colors';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+
+const _sfc_main$4 = /* @__PURE__ */ defineComponent({
+  __name: "ExportButtons",
+  __ssrInlineRender: true,
+  emits: ["csv", "pdf"],
+  setup(__props, { emit: __emit }) {
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UButton = _sfc_main$5;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "flex items-center gap-2" }, _attrs))}>`);
+      _push(ssrRenderComponent(_component_UButton, {
+        size: "sm",
+        color: "primary",
+        variant: "soft",
+        onClick: ($event) => _ctx.$emit("csv")
+      }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`Export CSV`);
+          } else {
+            return [
+              createTextVNode("Export CSV")
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(ssrRenderComponent(_component_UButton, {
+        size: "sm",
+        color: "neutral",
+        variant: "soft",
+        onClick: ($event) => _ctx.$emit("pdf")
+      }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`Export PDF`);
+          } else {
+            return [
+              createTextVNode("Export PDF")
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$4 = _sfc_main$4.setup;
+_sfc_main$4.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/reports/ExportButtons.vue");
+  return _sfc_setup$4 ? _sfc_setup$4(props, ctx) : void 0;
+};
+const __nuxt_component_3 = Object.assign(_sfc_main$4, { __name: "ReportsExportButtons" });
+const _sfc_main$3 = /* @__PURE__ */ defineComponent({
+  __name: "FilterBar",
+  __ssrInlineRender: true,
+  props: {
+    initial: { type: Object, default: () => ({}) },
+    technicians: { type: Array, default: () => [] }
+  },
+  emits: ["apply"],
+  setup(__props, { emit: __emit }) {
+    const props = __props;
+    const emit = __emit;
+    const local = ref({
+      range: props.initial.range || "7",
+      from: props.initial.from || "",
+      to: props.initial.to || "",
+      status: props.initial.status || "",
+      technician: props.initial.technician || "",
+      priority: props.initial.priority || ""
+    });
+    watch(() => props.initial, (v) => {
+      Object.assign(local.value, {
+        range: v.range || "7",
+        from: v.from || "",
+        to: v.to || "",
+        status: v.status || "",
+        technician: v.technician || "",
+        priority: v.priority || ""
+      });
+    });
+    const apply = () => {
+      emit("apply", { ...local.value });
+    };
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UCard = _sfc_main$6;
+      const _component_UButton = _sfc_main$5;
+      _push(ssrRenderComponent(_component_UCard, mergeProps({ ui: { body: "flex gap-3 flex-wrap items-center" } }, _attrs), {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`<div class="flex items-center gap-2"${_scopeId}><label class="text-sm text-muted-500"${_scopeId}>Date range</label><select class="form-select"${_scopeId}><option value="7"${ssrIncludeBooleanAttr(Array.isArray(local.value.range) ? ssrLooseContain(local.value.range, "7") : ssrLooseEqual(local.value.range, "7")) ? " selected" : ""}${_scopeId}>Last 7 days</option><option value="30"${ssrIncludeBooleanAttr(Array.isArray(local.value.range) ? ssrLooseContain(local.value.range, "30") : ssrLooseEqual(local.value.range, "30")) ? " selected" : ""}${_scopeId}>Last 30 days</option><option value="custom"${ssrIncludeBooleanAttr(Array.isArray(local.value.range) ? ssrLooseContain(local.value.range, "custom") : ssrLooseEqual(local.value.range, "custom")) ? " selected" : ""}${_scopeId}>Custom range</option></select></div>`);
+            if (local.value.range === "custom") {
+              _push2(`<div class="flex items-center gap-2"${_scopeId}><input${ssrRenderAttr("value", local.value.from)} type="date" class="form-input"${_scopeId}><input${ssrRenderAttr("value", local.value.to)} type="date" class="form-input"${_scopeId}></div>`);
+            } else {
+              _push2(`<!---->`);
+            }
+            _push2(`<div class="flex items-center gap-2"${_scopeId}><label class="text-sm text-muted-500"${_scopeId}>Status</label><select class="form-select"${_scopeId}><option value=""${ssrIncludeBooleanAttr(Array.isArray(local.value.status) ? ssrLooseContain(local.value.status, "") : ssrLooseEqual(local.value.status, "")) ? " selected" : ""}${_scopeId}>Any</option><option value="open"${ssrIncludeBooleanAttr(Array.isArray(local.value.status) ? ssrLooseContain(local.value.status, "open") : ssrLooseEqual(local.value.status, "open")) ? " selected" : ""}${_scopeId}>Open</option><option value="in_progress"${ssrIncludeBooleanAttr(Array.isArray(local.value.status) ? ssrLooseContain(local.value.status, "in_progress") : ssrLooseEqual(local.value.status, "in_progress")) ? " selected" : ""}${_scopeId}>In Progress</option><option value="pending"${ssrIncludeBooleanAttr(Array.isArray(local.value.status) ? ssrLooseContain(local.value.status, "pending") : ssrLooseEqual(local.value.status, "pending")) ? " selected" : ""}${_scopeId}>Pending</option><option value="resolved"${ssrIncludeBooleanAttr(Array.isArray(local.value.status) ? ssrLooseContain(local.value.status, "resolved") : ssrLooseEqual(local.value.status, "resolved")) ? " selected" : ""}${_scopeId}>Resolved</option><option value="closed"${ssrIncludeBooleanAttr(Array.isArray(local.value.status) ? ssrLooseContain(local.value.status, "closed") : ssrLooseEqual(local.value.status, "closed")) ? " selected" : ""}${_scopeId}>Closed</option></select></div><div class="flex items-center gap-2"${_scopeId}><label class="text-sm text-muted-500"${_scopeId}>Technician</label><select class="form-select"${_scopeId}><option value=""${ssrIncludeBooleanAttr(Array.isArray(local.value.technician) ? ssrLooseContain(local.value.technician, "") : ssrLooseEqual(local.value.technician, "")) ? " selected" : ""}${_scopeId}>Any</option><!--[-->`);
+            ssrRenderList(__props.technicians, (t) => {
+              _push2(`<option${ssrRenderAttr("value", t.id)}${ssrIncludeBooleanAttr(Array.isArray(local.value.technician) ? ssrLooseContain(local.value.technician, t.id) : ssrLooseEqual(local.value.technician, t.id)) ? " selected" : ""}${_scopeId}>${ssrInterpolate(t.name || t.email)}</option>`);
+            });
+            _push2(`<!--]--></select></div><div class="flex items-center gap-2"${_scopeId}><label class="text-sm text-muted-500"${_scopeId}>Priority</label><select class="form-select"${_scopeId}><option value=""${ssrIncludeBooleanAttr(Array.isArray(local.value.priority) ? ssrLooseContain(local.value.priority, "") : ssrLooseEqual(local.value.priority, "")) ? " selected" : ""}${_scopeId}>Any</option><option value="low"${ssrIncludeBooleanAttr(Array.isArray(local.value.priority) ? ssrLooseContain(local.value.priority, "low") : ssrLooseEqual(local.value.priority, "low")) ? " selected" : ""}${_scopeId}>Low</option><option value="medium"${ssrIncludeBooleanAttr(Array.isArray(local.value.priority) ? ssrLooseContain(local.value.priority, "medium") : ssrLooseEqual(local.value.priority, "medium")) ? " selected" : ""}${_scopeId}>Medium</option><option value="high"${ssrIncludeBooleanAttr(Array.isArray(local.value.priority) ? ssrLooseContain(local.value.priority, "high") : ssrLooseEqual(local.value.priority, "high")) ? " selected" : ""}${_scopeId}>High</option><option value="critical"${ssrIncludeBooleanAttr(Array.isArray(local.value.priority) ? ssrLooseContain(local.value.priority, "critical") : ssrLooseEqual(local.value.priority, "critical")) ? " selected" : ""}${_scopeId}>Critical</option></select></div><div class="ml-auto"${_scopeId}>`);
+            _push2(ssrRenderComponent(_component_UButton, {
+              color: "primary",
+              onClick: apply
+            }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(`Apply`);
+                } else {
+                  return [
+                    createTextVNode("Apply")
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+            _push2(`</div>`);
+          } else {
+            return [
+              createVNode("div", { class: "flex items-center gap-2" }, [
+                createVNode("label", { class: "text-sm text-muted-500" }, "Date range"),
+                withDirectives(createVNode("select", {
+                  "onUpdate:modelValue": ($event) => local.value.range = $event,
+                  class: "form-select"
+                }, [
+                  createVNode("option", { value: "7" }, "Last 7 days"),
+                  createVNode("option", { value: "30" }, "Last 30 days"),
+                  createVNode("option", { value: "custom" }, "Custom range")
+                ], 8, ["onUpdate:modelValue"]), [
+                  [vModelSelect, local.value.range]
+                ])
+              ]),
+              local.value.range === "custom" ? (openBlock(), createBlock("div", {
+                key: 0,
+                class: "flex items-center gap-2"
+              }, [
+                withDirectives(createVNode("input", {
+                  "onUpdate:modelValue": ($event) => local.value.from = $event,
+                  type: "date",
+                  class: "form-input"
+                }, null, 8, ["onUpdate:modelValue"]), [
+                  [vModelText, local.value.from]
+                ]),
+                withDirectives(createVNode("input", {
+                  "onUpdate:modelValue": ($event) => local.value.to = $event,
+                  type: "date",
+                  class: "form-input"
+                }, null, 8, ["onUpdate:modelValue"]), [
+                  [vModelText, local.value.to]
+                ])
+              ])) : createCommentVNode("", true),
+              createVNode("div", { class: "flex items-center gap-2" }, [
+                createVNode("label", { class: "text-sm text-muted-500" }, "Status"),
+                withDirectives(createVNode("select", {
+                  "onUpdate:modelValue": ($event) => local.value.status = $event,
+                  class: "form-select"
+                }, [
+                  createVNode("option", { value: "" }, "Any"),
+                  createVNode("option", { value: "open" }, "Open"),
+                  createVNode("option", { value: "in_progress" }, "In Progress"),
+                  createVNode("option", { value: "pending" }, "Pending"),
+                  createVNode("option", { value: "resolved" }, "Resolved"),
+                  createVNode("option", { value: "closed" }, "Closed")
+                ], 8, ["onUpdate:modelValue"]), [
+                  [vModelSelect, local.value.status]
+                ])
+              ]),
+              createVNode("div", { class: "flex items-center gap-2" }, [
+                createVNode("label", { class: "text-sm text-muted-500" }, "Technician"),
+                withDirectives(createVNode("select", {
+                  "onUpdate:modelValue": ($event) => local.value.technician = $event,
+                  class: "form-select"
+                }, [
+                  createVNode("option", { value: "" }, "Any"),
+                  (openBlock(true), createBlock(Fragment, null, renderList(__props.technicians, (t) => {
+                    return openBlock(), createBlock("option", {
+                      key: t.id,
+                      value: t.id
+                    }, toDisplayString(t.name || t.email), 9, ["value"]);
+                  }), 128))
+                ], 8, ["onUpdate:modelValue"]), [
+                  [vModelSelect, local.value.technician]
+                ])
+              ]),
+              createVNode("div", { class: "flex items-center gap-2" }, [
+                createVNode("label", { class: "text-sm text-muted-500" }, "Priority"),
+                withDirectives(createVNode("select", {
+                  "onUpdate:modelValue": ($event) => local.value.priority = $event,
+                  class: "form-select"
+                }, [
+                  createVNode("option", { value: "" }, "Any"),
+                  createVNode("option", { value: "low" }, "Low"),
+                  createVNode("option", { value: "medium" }, "Medium"),
+                  createVNode("option", { value: "high" }, "High"),
+                  createVNode("option", { value: "critical" }, "Critical")
+                ], 8, ["onUpdate:modelValue"]), [
+                  [vModelSelect, local.value.priority]
+                ])
+              ]),
+              createVNode("div", { class: "ml-auto" }, [
+                createVNode(_component_UButton, {
+                  color: "primary",
+                  onClick: apply
+                }, {
+                  default: withCtx(() => [
+                    createTextVNode("Apply")
+                  ]),
+                  _: 1
+                })
+              ])
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+    };
+  }
+});
+const _sfc_setup$3 = _sfc_main$3.setup;
+_sfc_main$3.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/reports/FilterBar.vue");
+  return _sfc_setup$3 ? _sfc_setup$3(props, ctx) : void 0;
+};
+const __nuxt_component_4 = Object.assign(_sfc_main$3, { __name: "ReportsFilterBar" });
+const _sfc_main$2 = /* @__PURE__ */ defineComponent({
+  __name: "KPICards",
+  __ssrInlineRender: true,
+  props: {
+    tickets: { type: Array, default: () => [] },
+    avgResolutionMinutes: { type: Number, required: false },
+    resolvedCountOverride: { type: Number, required: false }
+  },
+  setup(__props) {
+    const props = __props;
+    const resolvedCount = computed(() => {
+      if (typeof props.resolvedCountOverride === "number") return props.resolvedCountOverride;
+      return props.tickets.filter((t) => t.status === "resolved" || t.status === "closed").length;
+    });
+    const avgResolutionMs = computed(() => {
+      if (typeof props.avgResolutionMinutes === "number") return props.avgResolutionMinutes * 6e4;
+      const resolved = props.tickets.filter((t) => t.closed_at && t.created_at);
+      if (!resolved.length) return 0;
+      const total = resolved.reduce((sum, r) => {
+        const a = new Date(r.created_at).getTime();
+        const b = new Date(r.closed_at).getTime();
+        return sum + Math.max(0, b - a);
+      }, 0);
+      return total / resolved.length;
+    });
+    const avgResolutionDisplay = computed(() => {
+      const ms = Math.round(avgResolutionMs.value);
+      if (!ms) return "-";
+      const mins = Math.floor(ms / 6e4);
+      const hours = Math.floor(mins / 60);
+      const remMin = mins % 60;
+      return `${hours}h ${remMin}m`;
+    });
+    const avgSatisfaction = computed(() => {
+      const vals = props.tickets.map((t) => Number(t.satisfaction)).filter((n) => !Number.isNaN(n));
+      if (!vals.length) return "-";
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      return Math.round(avg * 10) / 10;
+    });
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UCard = _sfc_main$6;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" }, _attrs))}>`);
+      _push(ssrRenderComponent(_component_UCard, { class: "h-full" }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`<div class="space-y-1"${_scopeId}><p class="text-xs font-semibold uppercase tracking-wide text-muted-500"${_scopeId}>Average resolution time</p><p class="text-3xl font-semibold text-gray-900"${_scopeId}>${ssrInterpolate(avgResolutionDisplay.value)}</p><p class="text-sm text-muted-500"${_scopeId}>Selected period</p></div>`);
+          } else {
+            return [
+              createVNode("div", { class: "space-y-1" }, [
+                createVNode("p", { class: "text-xs font-semibold uppercase tracking-wide text-muted-500" }, "Average resolution time"),
+                createVNode("p", { class: "text-3xl font-semibold text-gray-900" }, toDisplayString(avgResolutionDisplay.value), 1),
+                createVNode("p", { class: "text-sm text-muted-500" }, "Selected period")
+              ])
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(ssrRenderComponent(_component_UCard, { class: "h-full" }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`<div class="space-y-1"${_scopeId}><p class="text-xs font-semibold uppercase tracking-wide text-muted-500"${_scopeId}>Tickets resolved</p><p class="text-3xl font-semibold text-gray-900"${_scopeId}>${ssrInterpolate(resolvedCount.value)}</p><p class="text-sm text-muted-500"${_scopeId}>Selected period</p></div>`);
+          } else {
+            return [
+              createVNode("div", { class: "space-y-1" }, [
+                createVNode("p", { class: "text-xs font-semibold uppercase tracking-wide text-muted-500" }, "Tickets resolved"),
+                createVNode("p", { class: "text-3xl font-semibold text-gray-900" }, toDisplayString(resolvedCount.value), 1),
+                createVNode("p", { class: "text-sm text-muted-500" }, "Selected period")
+              ])
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(ssrRenderComponent(_component_UCard, { class: "h-full" }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`<div class="space-y-1"${_scopeId}><p class="text-xs font-semibold uppercase tracking-wide text-muted-500"${_scopeId}>Customer satisfaction</p><p class="text-3xl font-semibold text-gray-900"${_scopeId}>${ssrInterpolate(avgSatisfaction.value)}</p><p class="text-sm text-muted-500"${_scopeId}>Average (/5)</p></div>`);
+          } else {
+            return [
+              createVNode("div", { class: "space-y-1" }, [
+                createVNode("p", { class: "text-xs font-semibold uppercase tracking-wide text-muted-500" }, "Customer satisfaction"),
+                createVNode("p", { class: "text-3xl font-semibold text-gray-900" }, toDisplayString(avgSatisfaction.value), 1),
+                createVNode("p", { class: "text-sm text-muted-500" }, "Average (/5)")
+              ])
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$2 = _sfc_main$2.setup;
+_sfc_main$2.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/reports/KPICards.vue");
+  return _sfc_setup$2 ? _sfc_setup$2(props, ctx) : void 0;
+};
+const __nuxt_component_5 = Object.assign(_sfc_main$2, { __name: "ReportsKPICards" });
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "Charts",
+  __ssrInlineRender: true,
+  props: {
+    labels: { type: Array, required: true },
+    data: { type: Array, required: true },
+    // optional secondary dataset for the second chart
+    secondaryData: { type: Array, required: false },
+    secondaryLabel: { type: String, required: false }
+  },
+  setup(__props) {
+    Chart.register(
+      Title,
+      Tooltip,
+      Legend,
+      LineElement,
+      PointElement,
+      CategoryScale,
+      LinearScale
+    );
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false
+    };
+    const props = __props;
+    const chartDataPrimary = computed(() => ({
+      labels: props.labels || [],
+      datasets: [
+        {
+          label: "Tickets resolved",
+          data: Array.isArray(props.data) ? props.data.map((v) => Number(v) || 0) : [],
+          tension: 0.3,
+          borderColor: "#3b82f6",
+          backgroundColor: "rgba(59,130,246,0.08)"
+        }
+      ]
+    }));
+    const chartDataSecondary = computed(() => ({
+      labels: props.labels || [],
+      datasets: [
+        {
+          label: props.secondaryLabel || "Average solution time (minutes)",
+          data: Array.isArray(props.secondaryData) ? props.secondaryData.map((v) => Number(v) || 0) : [],
+          tension: 0.3,
+          borderColor: "#10b981",
+          backgroundColor: "rgba(16,185,129,0.08)"
+        }
+      ]
+    }));
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UCard = _sfc_main$6;
+      _push(`<div${ssrRenderAttrs(mergeProps({ class: "grid gap-4 lg:grid-cols-2" }, _attrs))}>`);
+      _push(ssrRenderComponent(_component_UCard, null, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`<p class="text-sm font-semibold text-gray-900 mb-2"${_scopeId}>Resolved over time</p><div style="${ssrRenderStyle({ "height": "300px" })}"${_scopeId}>`);
+            _push2(ssrRenderComponent(unref(Line), {
+              data: chartDataPrimary.value,
+              options: chartOptions
+            }, null, _parent2, _scopeId));
+            _push2(`</div>`);
+          } else {
+            return [
+              createVNode("p", { class: "text-sm font-semibold text-gray-900 mb-2" }, "Resolved over time"),
+              createVNode("div", { style: { "height": "300px" } }, [
+                createVNode(unref(Line), {
+                  data: chartDataPrimary.value,
+                  options: chartOptions
+                }, null, 8, ["data"])
+              ])
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(ssrRenderComponent(_component_UCard, null, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`<p class="text-sm font-semibold text-gray-900 mb-2"${_scopeId}>Average resolution time (trend)</p><div style="${ssrRenderStyle({ "height": "300px" })}"${_scopeId}>`);
+            _push2(ssrRenderComponent(unref(Line), {
+              data: chartDataSecondary.value,
+              options: chartOptions
+            }, null, _parent2, _scopeId));
+            _push2(`</div>`);
+          } else {
+            return [
+              createVNode("p", { class: "text-sm font-semibold text-gray-900 mb-2" }, "Average resolution time (trend)"),
+              createVNode("div", { style: { "height": "300px" } }, [
+                createVNode(unref(Line), {
+                  data: chartDataSecondary.value,
+                  options: chartOptions
+                }, null, 8, ["data"])
+              ])
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div>`);
+    };
+  }
+});
+const _sfc_setup$1 = _sfc_main$1.setup;
+_sfc_main$1.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/reports/Charts.vue");
+  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
+};
+const __nuxt_component_6 = Object.assign(_sfc_main$1, { __name: "ReportsCharts" });
+const getAverageResolutionTime = async (criteria = {}) => {
+  const token = useCookie("auth_token");
+  let bearer = token.value || "";
+  try {
+    bearer = decodeURIComponent(bearer);
+  } catch {
+  }
+  const params = new URLSearchParams();
+  if (criteria.range) params.append("range", criteria.range);
+  if (criteria.from) params.append("from", criteria.from);
+  if (criteria.to) params.append("to", criteria.to);
+  if (criteria.status) params.append("status", criteria.status);
+  if (criteria.technician) params.append("technician", criteria.technician);
+  let url = "http://localhost:8000/api/reports/average-resolution-time";
+  const qs = params.toString();
+  if (qs) url += `?${qs}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${bearer}`
+    }
+  });
+  const raw = await response.json();
+  if (!response.ok) throw raw;
+  return raw?.data ?? raw;
+};
+const getTicketsResolved = async (criteria = {}) => {
+  const token = useCookie("auth_token");
+  let bearer = token.value || "";
+  try {
+    bearer = decodeURIComponent(bearer);
+  } catch {
+  }
+  const params = new URLSearchParams();
+  if (criteria.from) params.append("from", criteria.from);
+  if (criteria.to) params.append("to", criteria.to);
+  if (criteria.technician_id || criteria.technician) params.append("technician_id", criteria.technician_id ?? criteria.technician);
+  if (criteria.priority) params.append("priority", criteria.priority);
+  let url = "http://localhost:8000/api/reports/tickets-resolved";
+  const qs = params.toString();
+  if (qs) url += `?${qs}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${bearer}`
+    }
+  });
+  const raw = await response.json();
+  if (!response.ok) throw raw;
+  return raw?.data ?? raw;
+};
+const getTicketsResolvedOverTime = async (criteria = {}) => {
+  const token = useCookie("auth_token");
+  let bearer = token.value || "";
+  try {
+    bearer = decodeURIComponent(bearer);
+  } catch {
+  }
+  const params = new URLSearchParams();
+  if (criteria.from) params.append("from", criteria.from);
+  if (criteria.to) params.append("to", criteria.to);
+  if (criteria.technician_id || criteria.technician) params.append("technician_id", criteria.technician_id ?? criteria.technician);
+  let url = "http://localhost:8000/api/reports/tickets-resolved-overtime";
+  const qs = params.toString();
+  if (qs) url += `?${qs}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${bearer}`
+    }
+  });
+  const raw = await response.json();
+  if (!response.ok) throw raw;
+  return { labels: raw.labels ?? raw.data?.labels ?? [], values: raw.values ?? raw.data?.values ?? [] };
+};
+const getSolutionTimeTrends = async (criteria = {}) => {
+  const token = useCookie("auth_token");
+  let bearer = token.value || "";
+  try {
+    bearer = decodeURIComponent(bearer);
+  } catch {
+  }
+  const params = new URLSearchParams();
+  if (criteria.from) params.append("from", criteria.from);
+  if (criteria.to) params.append("to", criteria.to);
+  let url = "http://localhost:8000/api/reports/solution-time-trends";
+  const qs = params.toString();
+  if (qs) url += `?${qs}`;
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${bearer}`
+    }
+  });
+  const raw = await response.json();
+  if (!response.ok) throw raw;
+  return { labels: raw.labels ?? raw.data?.labels ?? [], values: raw.values ?? raw.data?.values ?? [] };
+};
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "index",
+  __ssrInlineRender: true,
+  setup(__props) {
+    const range = ref("7");
+    const customFrom = ref("");
+    const customTo = ref("");
+    const status = ref("");
+    const technician = ref("");
+    const priority = ref("");
+    const tickets = ref([]);
+    const loading = ref(false);
+    const avgResolutionMinutes = ref(null);
+    const resolvedCountApi = ref(null);
+    const resolvedLabels = ref([]);
+    const resolvedValues = ref([]);
+    const solutionLabels = ref([]);
+    const solutionValues = ref([]);
+    const technicians = ref([]);
+    const buildParams = () => {
+      const p = new URLSearchParams();
+      if (status.value) p.append("status", status.value);
+      if (priority.value) p.append("priority", priority.value);
+      if (technician.value) p.append("technician", technician.value);
+      if (range.value !== "custom") {
+        p.append("range", range.value);
+      } else {
+        if (customFrom.value) p.append("from", customFrom.value);
+        if (customTo.value) p.append("to", customTo.value);
+      }
+      return p.toString();
+    };
+    const buildCriteria = () => {
+      const c = {};
+      if (status.value) c.status = status.value;
+      if (priority.value) c.priority = priority.value;
+      if (technician.value) {
+        c.technician = technician.value;
+        c.technician_id = technician.value;
+      }
+      if (range.value !== "custom") c.range = range.value;
+      else {
+        if (customFrom.value) c.from = customFrom.value;
+        if (customTo.value) c.to = customTo.value;
+      }
+      return c;
+    };
+    const fetchTickets = async () => {
+      loading.value = true;
+      try {
+        const token = useCookie("auth_token");
+        let bearer = token.value || "";
+        try {
+          bearer = decodeURIComponent(bearer);
+        } catch {
+        }
+        const qs = buildParams();
+        let url = "http://localhost:8000/api/tickets";
+        if (qs) url += `?${qs}`;
+        const res = await fetch(url, { headers: { Authorization: `Bearer ${bearer}` } });
+        const raw = await res.json();
+        if (Array.isArray(raw)) tickets.value = raw;
+        else if (Array.isArray(raw.data)) tickets.value = raw.data;
+        else if (Array.isArray(raw.tickets)) tickets.value = raw.tickets;
+        else tickets.value = [];
+        try {
+          const criteria = buildCriteria();
+          const avg = await getAverageResolutionTime(criteria);
+          if (avg && typeof avg.average_resolution_time_minutes !== "undefined") avgResolutionMinutes.value = Number(avg.average_resolution_time_minutes);
+          else avgResolutionMinutes.value = null;
+        } catch (e) {
+          avgResolutionMinutes.value = null;
+        }
+        try {
+          const criteria2 = buildCriteria();
+          const rc = await getTicketsResolved(criteria2);
+          if (rc && typeof rc.total !== "undefined") resolvedCountApi.value = Number(rc.total);
+          else if (rc && typeof rc.count !== "undefined") resolvedCountApi.value = Number(rc.count);
+          else if (rc && typeof rc.tickets_resolved !== "undefined") resolvedCountApi.value = Number(rc.tickets_resolved);
+          else if (typeof rc === "number") resolvedCountApi.value = rc;
+          else resolvedCountApi.value = null;
+        } catch (e) {
+          resolvedCountApi.value = null;
+        }
+        try {
+          const criteria3 = buildCriteria();
+          const over = await getTicketsResolvedOverTime(criteria3);
+          resolvedLabels.value = Array.isArray(over.labels) ? over.labels : [];
+          resolvedValues.value = Array.isArray(over.values) ? over.values : [];
+        } catch (e) {
+          resolvedLabels.value = [];
+          resolvedValues.value = [];
+        }
+        try {
+          const criteria4 = buildCriteria();
+          const sol = await getSolutionTimeTrends(criteria4);
+          solutionLabels.value = Array.isArray(sol.labels) ? sol.labels : [];
+          solutionValues.value = Array.isArray(sol.values) ? sol.values : [];
+        } catch (e) {
+          solutionLabels.value = [];
+          solutionValues.value = [];
+        }
+      } catch (err) {
+        console.error("fetchTickets", err);
+        tickets.value = [];
+      } finally {
+        loading.value = false;
+      }
+    };
+    const applyFilters = async () => {
+      await fetchTickets();
+    };
+    computed(() => tickets.value.filter((t) => t.status === "resolved" || t.status === "closed").length);
+    const avgResolutionMs = computed(() => {
+      const resolved = tickets.value.filter((t) => t.closed_at && t.created_at);
+      if (!resolved.length) return 0;
+      const total = resolved.reduce((sum, r) => {
+        const a = new Date(r.created_at).getTime();
+        const b = new Date(r.closed_at).getTime();
+        return sum + Math.max(0, b - a);
+      }, 0);
+      return total / resolved.length;
+    });
+    computed(() => {
+      const ms = Math.round(avgResolutionMs.value);
+      if (!ms) return "-";
+      const mins = Math.floor(ms / 6e4);
+      const hours = Math.floor(mins / 60);
+      const remMin = mins % 60;
+      return `${hours}h ${remMin}m`;
+    });
+    computed(() => {
+      const vals = tickets.value.map((t) => Number(t.satisfaction)).filter((n) => !Number.isNaN(n));
+      if (!vals.length) return "-";
+      const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+      return Math.round(avg * 10) / 10;
+    });
+    computed(() => {
+      const map = /* @__PURE__ */ new Map();
+      tickets.value.forEach((t) => {
+        const d = t.closed_at ? new Date(t.closed_at) : null;
+        if (!d) return;
+        const key = d.toISOString().slice(0, 10);
+        map.set(key, (map.get(key) || 0) + 1);
+      });
+      const days = Array.from(map.keys()).sort();
+      return { labels: days, data: days.map((d) => map.get(d) || 0) };
+    });
+    const formatDate = (val) => {
+      if (!val) return "";
+      const d = new Date(val);
+      if (Number.isNaN(d.getTime())) return String(val);
+      return d.toLocaleString();
+    };
+    const downloadCSV = () => {
+      const rows = [["Ticket ID", "Subject", "Status", "Technician", "Created At", "Closed At", "Resolution Time", "Satisfaction"]];
+      tickets.value.forEach((t) => {
+        const created = formatDate(t.created_at);
+        const closed = formatDate(t.closed_at);
+        const resTime = t.created_at && t.closed_at ? (() => {
+          const ms = new Date(t.closed_at).getTime() - new Date(t.created_at).getTime();
+          const mins = Math.floor(ms / 6e4);
+          return `${Math.floor(mins / 60)}h ${mins % 60}m`;
+        })() : "";
+        rows.push([t.id, t.title || t.subject || "", t.status || "", t.technician_name || t.technician || "", created, closed, resTime, t.satisfaction || ""]);
+      });
+      const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = (void 0).createElement("a");
+      a.href = url;
+      a.download = "reports.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    };
+    const exportPDF = () => {
+      const wnd = (void 0).open("", "_blank");
+      if (!wnd) return;
+      const rows = tickets.value.map((t) => `<tr><td>${t.id}</td><td>${t.title || t.subject || ""}</td><td>${t.status || ""}</td><td>${t.technician_name || t.technician || ""}</td><td>${formatDate(t.created_at)}</td><td>${formatDate(t.closed_at)}</td><td>${t.satisfaction || ""}</td></tr>`).join("");
+      wnd.document.write(`<html><head><title>Reports</title><style>table{width:100%;border-collapse:collapse}td,th{border:1px solid #ddd;padding:8px;text-align:left}</style></head><body><h2>Reports</h2><table><thead><tr><th>ID</th><th>Subject</th><th>Status</th><th>Technician</th><th>Created</th><th>Closed</th><th>Satisfaction</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);
+      wnd.document.close();
+      wnd.focus();
+      wnd.print();
+    };
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UDashboardGroup = _sfc_main$e;
+      const _component_Sidebar = __nuxt_component_1;
+      const _component_UDashboardPage = resolveComponent("UDashboardPage");
+      const _component_Navbar = __nuxt_component_2;
+      const _component_UDashboardPageHeader = resolveComponent("UDashboardPageHeader");
+      const _component_reportsExportButtons = __nuxt_component_3;
+      const _component_reportsFilterBar = __nuxt_component_4;
+      const _component_reportsKPICards = __nuxt_component_5;
+      const _component_reportsCharts = __nuxt_component_6;
+      _push(ssrRenderComponent(_component_UDashboardGroup, _attrs, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(_component_Sidebar, null, null, _parent2, _scopeId));
+            _push2(ssrRenderComponent(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(ssrRenderComponent(_component_Navbar, {
+                    title: "Reports",
+                    icon: "i-lucide-file-chart-line",
+                    class: "w-full"
+                  }, null, _parent3, _scopeId2));
+                  _push3(`<div class="flex flex-col flex-1 gap-6 p-6 overflow-auto"${_scopeId2}><div class="flex items-center justify-between gap-3"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UDashboardPageHeader, {
+                    title: "Reports / Analytics",
+                    description: "Key metrics and trends for tickets."
+                  }, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_reportsExportButtons, {
+                    onCsv: downloadCSV,
+                    onPdf: exportPDF
+                  }, null, _parent3, _scopeId2));
+                  _push3(`</div>`);
+                  _push3(ssrRenderComponent(_component_reportsFilterBar, {
+                    initial: { range: range.value, from: customFrom.value, to: customTo.value, status: status.value, technician: technician.value, priority: priority.value },
+                    technicians: technicians.value,
+                    onApply: (f) => {
+                      range.value.value = f.range;
+                      customFrom.value.value = f.from;
+                      customTo.value.value = f.to;
+                      status.value.value = f.status;
+                      technician.value.value = f.technician;
+                      priority.value.value = f.priority;
+                      applyFilters();
+                    }
+                  }, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_reportsKPICards, {
+                    tickets: tickets.value,
+                    "avg-resolution-minutes": avgResolutionMinutes.value,
+                    "resolved-count-override": resolvedCountApi.value
+                  }, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_reportsCharts, {
+                    labels: resolvedLabels.value,
+                    data: resolvedValues.value,
+                    "secondary-data": solutionValues.value,
+                    "secondary-label": "Avg solution time (min)"
+                  }, null, _parent3, _scopeId2));
+                  _push3(`</div>`);
+                } else {
+                  return [
+                    createVNode(_component_Navbar, {
+                      title: "Reports",
+                      icon: "i-lucide-file-chart-line",
+                      class: "w-full"
+                    }),
+                    createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                      createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                        createVNode(_component_UDashboardPageHeader, {
+                          title: "Reports / Analytics",
+                          description: "Key metrics and trends for tickets."
+                        }),
+                        createVNode(_component_reportsExportButtons, {
+                          onCsv: downloadCSV,
+                          onPdf: exportPDF
+                        })
+                      ]),
+                      createVNode(_component_reportsFilterBar, {
+                        initial: { range: range.value, from: customFrom.value, to: customTo.value, status: status.value, technician: technician.value, priority: priority.value },
+                        technicians: technicians.value,
+                        onApply: (f) => {
+                          range.value.value = f.range;
+                          customFrom.value.value = f.from;
+                          customTo.value.value = f.to;
+                          status.value.value = f.status;
+                          technician.value.value = f.technician;
+                          priority.value.value = f.priority;
+                          applyFilters();
+                        }
+                      }, null, 8, ["initial", "technicians", "onApply"]),
+                      createVNode(_component_reportsKPICards, {
+                        tickets: tickets.value,
+                        "avg-resolution-minutes": avgResolutionMinutes.value,
+                        "resolved-count-override": resolvedCountApi.value
+                      }, null, 8, ["tickets", "avg-resolution-minutes", "resolved-count-override"]),
+                      createVNode(_component_reportsCharts, {
+                        labels: resolvedLabels.value,
+                        data: resolvedValues.value,
+                        "secondary-data": solutionValues.value,
+                        "secondary-label": "Avg solution time (min)"
+                      }, null, 8, ["labels", "data", "secondary-data"])
+                    ])
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(_component_Sidebar),
+              createVNode(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+                default: withCtx(() => [
+                  createVNode(_component_Navbar, {
+                    title: "Reports",
+                    icon: "i-lucide-file-chart-line",
+                    class: "w-full"
+                  }),
+                  createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                    createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                      createVNode(_component_UDashboardPageHeader, {
+                        title: "Reports / Analytics",
+                        description: "Key metrics and trends for tickets."
+                      }),
+                      createVNode(_component_reportsExportButtons, {
+                        onCsv: downloadCSV,
+                        onPdf: exportPDF
+                      })
+                    ]),
+                    createVNode(_component_reportsFilterBar, {
+                      initial: { range: range.value, from: customFrom.value, to: customTo.value, status: status.value, technician: technician.value, priority: priority.value },
+                      technicians: technicians.value,
+                      onApply: (f) => {
+                        range.value.value = f.range;
+                        customFrom.value.value = f.from;
+                        customTo.value.value = f.to;
+                        status.value.value = f.status;
+                        technician.value.value = f.technician;
+                        priority.value.value = f.priority;
+                        applyFilters();
+                      }
+                    }, null, 8, ["initial", "technicians", "onApply"]),
+                    createVNode(_component_reportsKPICards, {
+                      tickets: tickets.value,
+                      "avg-resolution-minutes": avgResolutionMinutes.value,
+                      "resolved-count-override": resolvedCountApi.value
+                    }, null, 8, ["tickets", "avg-resolution-minutes", "resolved-count-override"]),
+                    createVNode(_component_reportsCharts, {
+                      labels: resolvedLabels.value,
+                      data: resolvedValues.value,
+                      "secondary-data": solutionValues.value,
+                      "secondary-label": "Avg solution time (min)"
+                    }, null, 8, ["labels", "data", "secondary-data"])
+                  ])
+                ]),
+                _: 1
+              })
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+    };
+  }
+});
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/supervisor/reports/index.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+
+export { _sfc_main as default };
+//# sourceMappingURL=index-BtKfpmZi.mjs.map

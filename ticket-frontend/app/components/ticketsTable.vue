@@ -29,7 +29,7 @@ const columns = [
 const currentPage = ref(1)
 const perPage = ref(20)
 
-const { data: ticketsRaw, status, refresh } = await useAsyncData(
+const { data: ticketsRaw, status, refresh } = useAsyncData(
   () => `tickets-page-${currentPage.value}-${props.filters?.status || ''}-${props.filters?.priority || ''}-${props.filters?.category_id || ''}`,
   () => getTickets({ ...props.filters, status: (props.filters?.status ?? props.forceStatus), page: currentPage.value, per_page: perPage.value, _raw: true }),
   {

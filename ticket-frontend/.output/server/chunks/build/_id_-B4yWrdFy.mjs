@@ -1,0 +1,825 @@
+import { _ as _sfc_main$e, a as __nuxt_component_1, b as __nuxt_component_2 } from './navbar-DByaTdfk.mjs';
+import { b as _sfc_main$1 } from './usePortal-BKdXuyUd.mjs';
+import { _ as _sfc_main$2 } from './Card-o7xn3WFg.mjs';
+import { _ as _sfc_main$3 } from './Input-u_sFkXpR.mjs';
+import { _ as _sfc_main$4 } from './Select-Dv6KDMrI.mjs';
+import { defineComponent, computed, ref, reactive, withAsyncContext, watchEffect, resolveComponent, withCtx, unref, createTextVNode, toDisplayString, createVNode, createBlock, createCommentVNode, openBlock, withModifiers, useSSRContext } from 'vue';
+import { ssrRenderComponent, ssrInterpolate } from 'vue/server-renderer';
+import { g as getCategory, a as getCategories } from './categories-nlYrqBCy.mjs';
+import { d as useRoute, e as useRouter, b as useCookie } from './server.mjs';
+import { u as useAsyncData } from './index-Db0gMLsE.mjs';
+import 'reka-ui';
+import '../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import '@iconify/utils';
+import 'consola';
+import '@vueuse/core';
+import 'vaul-vue';
+import 'reka-ui/namespaced';
+import './nuxt-link-Bj7IzWuU.mjs';
+import 'tailwind-variants';
+import 'vue-router';
+import 'tailwindcss/colors';
+import '@iconify/vue';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import '@iconify/utils/lib/css/icon';
+import 'perfect-debounce';
+
+const updateCategory = async (id, { name, description, parent_category_id }) => {
+  const token = useCookie("auth_token");
+  let bearer = token.value || "";
+  try {
+    bearer = decodeURIComponent(bearer);
+  } catch {
+  }
+  const response = await fetch(`http://localhost:8000/api/categories/${id}`, {
+    method: "PUT",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${bearer}`
+    },
+    body: JSON.stringify({ name, description, parent_category_id })
+  });
+  const raw = await response.json();
+  if (!response.ok) {
+    throw raw;
+  }
+  return raw?.data || raw;
+};
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "[id]",
+  __ssrInlineRender: true,
+  async setup(__props) {
+    let __temp, __restore;
+    const route = useRoute();
+    useRouter();
+    const categoryId = computed(() => route.params.id);
+    const isEditing = ref(false);
+    const isSubmitting = ref(false);
+    const form = reactive({
+      name: "",
+      description: "",
+      parent_category_id: null
+    });
+    const { data: category, status, error, refresh } = ([__temp, __restore] = withAsyncContext(() => useAsyncData(
+      () => `category-${categoryId.value}`,
+      () => getCategory(categoryId.value),
+      {
+        server: false,
+        lazy: false,
+        immediate: true,
+        watch: [categoryId]
+      }
+    )), __temp = await __temp, __restore(), __temp);
+    watchEffect(() => {
+      if (category.value) {
+        form.name = category.value.name ?? "";
+        form.description = category.value.description ?? "";
+        form.parent_category_id = category.value.parent_category_id ?? null;
+      }
+    });
+    const toggleEdit = () => {
+      isEditing.value = !isEditing.value;
+      if (!isEditing.value) {
+        if (category.value) {
+          form.name = category.value.name || "";
+          form.description = category.value.description || "";
+          form.parent_category_id = category.value.parent_category_id || "";
+        }
+      }
+    };
+    const { data: categories } = ([__temp, __restore] = withAsyncContext(() => useAsyncData(
+      "categories",
+      () => getCategories(),
+      { server: false }
+    )), __temp = await __temp, __restore(), __temp);
+    const parentOptions = async (query = "") => {
+      const cats = await getCategories(query);
+      const arr = Array.isArray(cats) ? cats : Array.isArray(cats.data) ? cats.data : [];
+      return [
+        { label: "None", value: null },
+        ...arr.filter((cat) => cat.id !== Number(categoryId.value)).map((cat) => ({
+          label: cat.name,
+          value: cat.id
+        }))
+      ];
+    };
+    const handleSave = async () => {
+      if (isSubmitting.value) return;
+      isSubmitting.value = true;
+      try {
+        await updateCategory(categoryId.value, {
+          name: form.name,
+          description: form.description,
+          parent_category_id: form.parent_category_id
+        });
+        await refresh();
+        isEditing.value = false;
+      } catch (err) {
+        console.error("Failed to update category", err);
+      } finally {
+        isSubmitting.value = false;
+      }
+    };
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UDashboardGroup = _sfc_main$e;
+      const _component_Sidebar = __nuxt_component_1;
+      const _component_UDashboardPage = resolveComponent("UDashboardPage");
+      const _component_Navbar = __nuxt_component_2;
+      const _component_UDashboardPageHeader = resolveComponent("UDashboardPageHeader");
+      const _component_UButton = _sfc_main$1;
+      const _component_UCard = _sfc_main$2;
+      const _component_UFormGroup = resolveComponent("UFormGroup");
+      const _component_UInput = _sfc_main$3;
+      const _component_USelect = _sfc_main$4;
+      _push(ssrRenderComponent(_component_UDashboardGroup, _attrs, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(_component_Sidebar, null, null, _parent2, _scopeId));
+            _push2(ssrRenderComponent(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(ssrRenderComponent(_component_Navbar, {
+                    title: "Category details",
+                    icon: "i-lucide-folder",
+                    class: "w-full"
+                  }, null, _parent3, _scopeId2));
+                  _push3(`<div class="flex flex-col flex-1 gap-6 p-6 overflow-auto"${_scopeId2}><div class="flex items-center justify-between gap-3"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UDashboardPageHeader, {
+                    title: unref(category)?.name || "Category details",
+                    description: unref(category)?.description || ""
+                  }, null, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_UButton, {
+                    size: "sm",
+                    icon: isEditing.value ? "i-lucide-x" : "i-lucide-pencil",
+                    color: isEditing.value ? "neutral" : "primary",
+                    onClick: toggleEdit
+                  }, {
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(`${ssrInterpolate(isEditing.value ? "Cancel" : "Edit")}`);
+                      } else {
+                        return [
+                          createTextVNode(toDisplayString(isEditing.value ? "Cancel" : "Edit"), 1)
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(`</div>`);
+                  _push3(ssrRenderComponent(_component_UCard, null, {
+                    header: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(`<div class="flex items-center justify-between"${_scopeId3}><p class="text-sm font-semibold text-highlighted"${_scopeId3}>Profile</p>`);
+                        if (unref(status) === "pending") {
+                          _push4(`<div class="text-xs text-muted"${_scopeId3}>Loading...</div>`);
+                        } else {
+                          _push4(`<!---->`);
+                        }
+                        _push4(`</div>`);
+                      } else {
+                        return [
+                          createVNode("div", { class: "flex items-center justify-between" }, [
+                            createVNode("p", { class: "text-sm font-semibold text-highlighted" }, "Profile"),
+                            unref(status) === "pending" ? (openBlock(), createBlock("div", {
+                              key: 0,
+                              class: "text-xs text-muted"
+                            }, "Loading...")) : createCommentVNode("", true)
+                          ])
+                        ];
+                      }
+                    }),
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        if (!isEditing.value) {
+                          _push4(`<div class="grid grid-cols-1 gap-4 sm:grid-cols-2"${_scopeId3}><div${_scopeId3}><p class="text-xs text-muted"${_scopeId3}>Name</p><p class="text-sm text-highlighted"${_scopeId3}>${ssrInterpolate(unref(category)?.name || "—")}</p></div><div${_scopeId3}><p class="text-xs text-muted"${_scopeId3}>Description</p><p class="text-sm text-highlighted"${_scopeId3}>${ssrInterpolate(unref(category)?.description || "—")}</p></div><div${_scopeId3}><p class="text-xs text-muted"${_scopeId3}>Parent Category</p><p class="text-sm text-highlighted"${_scopeId3}>${ssrInterpolate(unref(category)?.parent?.name || "—")}</p></div></div>`);
+                        } else {
+                          _push4(`<form class="flex flex-col gap-4"${_scopeId3}><div class="grid grid-cols-1 gap-4 sm:grid-cols-2"${_scopeId3}>`);
+                          _push4(ssrRenderComponent(_component_UFormGroup, {
+                            label: "Name",
+                            name: "name"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(ssrRenderComponent(_component_UInput, {
+                                  modelValue: form.name,
+                                  "onUpdate:modelValue": ($event) => form.name = $event,
+                                  required: "",
+                                  maxlength: "255"
+                                }, null, _parent5, _scopeId4));
+                              } else {
+                                return [
+                                  createVNode(_component_UInput, {
+                                    modelValue: form.name,
+                                    "onUpdate:modelValue": ($event) => form.name = $event,
+                                    required: "",
+                                    maxlength: "255"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(ssrRenderComponent(_component_UFormGroup, {
+                            label: "Description",
+                            name: "description"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(ssrRenderComponent(_component_UInput, {
+                                  modelValue: form.description,
+                                  "onUpdate:modelValue": ($event) => form.description = $event,
+                                  required: "",
+                                  maxlength: "255"
+                                }, null, _parent5, _scopeId4));
+                              } else {
+                                return [
+                                  createVNode(_component_UInput, {
+                                    modelValue: form.description,
+                                    "onUpdate:modelValue": ($event) => form.description = $event,
+                                    required: "",
+                                    maxlength: "255"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(`</div><div class="grid grid-cols-1 gap-4 sm:grid-cols-2"${_scopeId3}>`);
+                          _push4(ssrRenderComponent(_component_UFormGroup, {
+                            label: "Parent Category",
+                            name: "parent_category_id"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(ssrRenderComponent(_component_USelect, {
+                                  modelValue: form.parent_category_id,
+                                  "onUpdate:modelValue": ($event) => form.parent_category_id = $event,
+                                  options: parentOptions,
+                                  placeholder: "Select parent category",
+                                  searchable: "",
+                                  clearable: ""
+                                }, null, _parent5, _scopeId4));
+                              } else {
+                                return [
+                                  createVNode(_component_USelect, {
+                                    modelValue: form.parent_category_id,
+                                    "onUpdate:modelValue": ($event) => form.parent_category_id = $event,
+                                    options: parentOptions,
+                                    placeholder: "Select parent category",
+                                    searchable: "",
+                                    clearable: ""
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(`</div><div class="flex justify-end gap-3 pt-2"${_scopeId3}>`);
+                          _push4(ssrRenderComponent(_component_UButton, {
+                            type: "button",
+                            color: "neutral",
+                            variant: "ghost",
+                            onClick: toggleEdit
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(`Cancel`);
+                              } else {
+                                return [
+                                  createTextVNode("Cancel")
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(ssrRenderComponent(_component_UButton, {
+                            type: "submit",
+                            color: "primary",
+                            icon: "i-lucide-check",
+                            loading: isSubmitting.value,
+                            disabled: isSubmitting.value
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(` Save Changes `);
+                              } else {
+                                return [
+                                  createTextVNode(" Save Changes ")
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(`</div></form>`);
+                        }
+                        if (unref(error)) {
+                          _push4(`<div class="mt-4 text-sm text-error"${_scopeId3}>Failed to load user.</div>`);
+                        } else {
+                          _push4(`<!---->`);
+                        }
+                      } else {
+                        return [
+                          !isEditing.value ? (openBlock(), createBlock("div", {
+                            key: 0,
+                            class: "grid grid-cols-1 gap-4 sm:grid-cols-2"
+                          }, [
+                            createVNode("div", null, [
+                              createVNode("p", { class: "text-xs text-muted" }, "Name"),
+                              createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.name || "—"), 1)
+                            ]),
+                            createVNode("div", null, [
+                              createVNode("p", { class: "text-xs text-muted" }, "Description"),
+                              createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.description || "—"), 1)
+                            ]),
+                            createVNode("div", null, [
+                              createVNode("p", { class: "text-xs text-muted" }, "Parent Category"),
+                              createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.parent?.name || "—"), 1)
+                            ])
+                          ])) : (openBlock(), createBlock("form", {
+                            key: 1,
+                            class: "flex flex-col gap-4",
+                            onSubmit: withModifiers(handleSave, ["prevent"])
+                          }, [
+                            createVNode("div", { class: "grid grid-cols-1 gap-4 sm:grid-cols-2" }, [
+                              createVNode(_component_UFormGroup, {
+                                label: "Name",
+                                name: "name"
+                              }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_UInput, {
+                                    modelValue: form.name,
+                                    "onUpdate:modelValue": ($event) => form.name = $event,
+                                    required: "",
+                                    maxlength: "255"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_UFormGroup, {
+                                label: "Description",
+                                name: "description"
+                              }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_UInput, {
+                                    modelValue: form.description,
+                                    "onUpdate:modelValue": ($event) => form.description = $event,
+                                    required: "",
+                                    maxlength: "255"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            createVNode("div", { class: "grid grid-cols-1 gap-4 sm:grid-cols-2" }, [
+                              createVNode(_component_UFormGroup, {
+                                label: "Parent Category",
+                                name: "parent_category_id"
+                              }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_USelect, {
+                                    modelValue: form.parent_category_id,
+                                    "onUpdate:modelValue": ($event) => form.parent_category_id = $event,
+                                    options: parentOptions,
+                                    placeholder: "Select parent category",
+                                    searchable: "",
+                                    clearable: ""
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            createVNode("div", { class: "flex justify-end gap-3 pt-2" }, [
+                              createVNode(_component_UButton, {
+                                type: "button",
+                                color: "neutral",
+                                variant: "ghost",
+                                onClick: toggleEdit
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode("Cancel")
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_UButton, {
+                                type: "submit",
+                                color: "primary",
+                                icon: "i-lucide-check",
+                                loading: isSubmitting.value,
+                                disabled: isSubmitting.value
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(" Save Changes ")
+                                ]),
+                                _: 1
+                              }, 8, ["loading", "disabled"])
+                            ])
+                          ], 32)),
+                          unref(error) ? (openBlock(), createBlock("div", {
+                            key: 2,
+                            class: "mt-4 text-sm text-error"
+                          }, "Failed to load user.")) : createCommentVNode("", true)
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(`<div class="flex gap-3"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UButton, {
+                    color: "neutral",
+                    variant: "ghost",
+                    to: "/admin/users"
+                  }, {
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(`Back to list`);
+                      } else {
+                        return [
+                          createTextVNode("Back to list")
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_UButton, {
+                    size: "sm",
+                    icon: "i-lucide-refresh-ccw",
+                    variant: "outline",
+                    onClick: unref(refresh)
+                  }, {
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(`Refresh`);
+                      } else {
+                        return [
+                          createTextVNode("Refresh")
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(`</div></div>`);
+                } else {
+                  return [
+                    createVNode(_component_Navbar, {
+                      title: "Category details",
+                      icon: "i-lucide-folder",
+                      class: "w-full"
+                    }),
+                    createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                      createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                        createVNode(_component_UDashboardPageHeader, {
+                          title: unref(category)?.name || "Category details",
+                          description: unref(category)?.description || ""
+                        }, null, 8, ["title", "description"]),
+                        createVNode(_component_UButton, {
+                          size: "sm",
+                          icon: isEditing.value ? "i-lucide-x" : "i-lucide-pencil",
+                          color: isEditing.value ? "neutral" : "primary",
+                          onClick: toggleEdit
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode(toDisplayString(isEditing.value ? "Cancel" : "Edit"), 1)
+                          ]),
+                          _: 1
+                        }, 8, ["icon", "color"])
+                      ]),
+                      createVNode(_component_UCard, null, {
+                        header: withCtx(() => [
+                          createVNode("div", { class: "flex items-center justify-between" }, [
+                            createVNode("p", { class: "text-sm font-semibold text-highlighted" }, "Profile"),
+                            unref(status) === "pending" ? (openBlock(), createBlock("div", {
+                              key: 0,
+                              class: "text-xs text-muted"
+                            }, "Loading...")) : createCommentVNode("", true)
+                          ])
+                        ]),
+                        default: withCtx(() => [
+                          !isEditing.value ? (openBlock(), createBlock("div", {
+                            key: 0,
+                            class: "grid grid-cols-1 gap-4 sm:grid-cols-2"
+                          }, [
+                            createVNode("div", null, [
+                              createVNode("p", { class: "text-xs text-muted" }, "Name"),
+                              createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.name || "—"), 1)
+                            ]),
+                            createVNode("div", null, [
+                              createVNode("p", { class: "text-xs text-muted" }, "Description"),
+                              createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.description || "—"), 1)
+                            ]),
+                            createVNode("div", null, [
+                              createVNode("p", { class: "text-xs text-muted" }, "Parent Category"),
+                              createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.parent?.name || "—"), 1)
+                            ])
+                          ])) : (openBlock(), createBlock("form", {
+                            key: 1,
+                            class: "flex flex-col gap-4",
+                            onSubmit: withModifiers(handleSave, ["prevent"])
+                          }, [
+                            createVNode("div", { class: "grid grid-cols-1 gap-4 sm:grid-cols-2" }, [
+                              createVNode(_component_UFormGroup, {
+                                label: "Name",
+                                name: "name"
+                              }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_UInput, {
+                                    modelValue: form.name,
+                                    "onUpdate:modelValue": ($event) => form.name = $event,
+                                    required: "",
+                                    maxlength: "255"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_UFormGroup, {
+                                label: "Description",
+                                name: "description"
+                              }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_UInput, {
+                                    modelValue: form.description,
+                                    "onUpdate:modelValue": ($event) => form.description = $event,
+                                    required: "",
+                                    maxlength: "255"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            createVNode("div", { class: "grid grid-cols-1 gap-4 sm:grid-cols-2" }, [
+                              createVNode(_component_UFormGroup, {
+                                label: "Parent Category",
+                                name: "parent_category_id"
+                              }, {
+                                default: withCtx(() => [
+                                  createVNode(_component_USelect, {
+                                    modelValue: form.parent_category_id,
+                                    "onUpdate:modelValue": ($event) => form.parent_category_id = $event,
+                                    options: parentOptions,
+                                    placeholder: "Select parent category",
+                                    searchable: "",
+                                    clearable: ""
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            createVNode("div", { class: "flex justify-end gap-3 pt-2" }, [
+                              createVNode(_component_UButton, {
+                                type: "button",
+                                color: "neutral",
+                                variant: "ghost",
+                                onClick: toggleEdit
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode("Cancel")
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_UButton, {
+                                type: "submit",
+                                color: "primary",
+                                icon: "i-lucide-check",
+                                loading: isSubmitting.value,
+                                disabled: isSubmitting.value
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(" Save Changes ")
+                                ]),
+                                _: 1
+                              }, 8, ["loading", "disabled"])
+                            ])
+                          ], 32)),
+                          unref(error) ? (openBlock(), createBlock("div", {
+                            key: 2,
+                            class: "mt-4 text-sm text-error"
+                          }, "Failed to load user.")) : createCommentVNode("", true)
+                        ]),
+                        _: 1
+                      }),
+                      createVNode("div", { class: "flex gap-3" }, [
+                        createVNode(_component_UButton, {
+                          color: "neutral",
+                          variant: "ghost",
+                          to: "/admin/users"
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode("Back to list")
+                          ]),
+                          _: 1
+                        }),
+                        createVNode(_component_UButton, {
+                          size: "sm",
+                          icon: "i-lucide-refresh-ccw",
+                          variant: "outline",
+                          onClick: unref(refresh)
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode("Refresh")
+                          ]),
+                          _: 1
+                        }, 8, ["onClick"])
+                      ])
+                    ])
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(_component_Sidebar),
+              createVNode(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+                default: withCtx(() => [
+                  createVNode(_component_Navbar, {
+                    title: "Category details",
+                    icon: "i-lucide-folder",
+                    class: "w-full"
+                  }),
+                  createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                    createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                      createVNode(_component_UDashboardPageHeader, {
+                        title: unref(category)?.name || "Category details",
+                        description: unref(category)?.description || ""
+                      }, null, 8, ["title", "description"]),
+                      createVNode(_component_UButton, {
+                        size: "sm",
+                        icon: isEditing.value ? "i-lucide-x" : "i-lucide-pencil",
+                        color: isEditing.value ? "neutral" : "primary",
+                        onClick: toggleEdit
+                      }, {
+                        default: withCtx(() => [
+                          createTextVNode(toDisplayString(isEditing.value ? "Cancel" : "Edit"), 1)
+                        ]),
+                        _: 1
+                      }, 8, ["icon", "color"])
+                    ]),
+                    createVNode(_component_UCard, null, {
+                      header: withCtx(() => [
+                        createVNode("div", { class: "flex items-center justify-between" }, [
+                          createVNode("p", { class: "text-sm font-semibold text-highlighted" }, "Profile"),
+                          unref(status) === "pending" ? (openBlock(), createBlock("div", {
+                            key: 0,
+                            class: "text-xs text-muted"
+                          }, "Loading...")) : createCommentVNode("", true)
+                        ])
+                      ]),
+                      default: withCtx(() => [
+                        !isEditing.value ? (openBlock(), createBlock("div", {
+                          key: 0,
+                          class: "grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        }, [
+                          createVNode("div", null, [
+                            createVNode("p", { class: "text-xs text-muted" }, "Name"),
+                            createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.name || "—"), 1)
+                          ]),
+                          createVNode("div", null, [
+                            createVNode("p", { class: "text-xs text-muted" }, "Description"),
+                            createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.description || "—"), 1)
+                          ]),
+                          createVNode("div", null, [
+                            createVNode("p", { class: "text-xs text-muted" }, "Parent Category"),
+                            createVNode("p", { class: "text-sm text-highlighted" }, toDisplayString(unref(category)?.parent?.name || "—"), 1)
+                          ])
+                        ])) : (openBlock(), createBlock("form", {
+                          key: 1,
+                          class: "flex flex-col gap-4",
+                          onSubmit: withModifiers(handleSave, ["prevent"])
+                        }, [
+                          createVNode("div", { class: "grid grid-cols-1 gap-4 sm:grid-cols-2" }, [
+                            createVNode(_component_UFormGroup, {
+                              label: "Name",
+                              name: "name"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode(_component_UInput, {
+                                  modelValue: form.name,
+                                  "onUpdate:modelValue": ($event) => form.name = $event,
+                                  required: "",
+                                  maxlength: "255"
+                                }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UFormGroup, {
+                              label: "Description",
+                              name: "description"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode(_component_UInput, {
+                                  modelValue: form.description,
+                                  "onUpdate:modelValue": ($event) => form.description = $event,
+                                  required: "",
+                                  maxlength: "255"
+                                }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                              ]),
+                              _: 1
+                            })
+                          ]),
+                          createVNode("div", { class: "grid grid-cols-1 gap-4 sm:grid-cols-2" }, [
+                            createVNode(_component_UFormGroup, {
+                              label: "Parent Category",
+                              name: "parent_category_id"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode(_component_USelect, {
+                                  modelValue: form.parent_category_id,
+                                  "onUpdate:modelValue": ($event) => form.parent_category_id = $event,
+                                  options: parentOptions,
+                                  placeholder: "Select parent category",
+                                  searchable: "",
+                                  clearable: ""
+                                }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                              ]),
+                              _: 1
+                            })
+                          ]),
+                          createVNode("div", { class: "flex justify-end gap-3 pt-2" }, [
+                            createVNode(_component_UButton, {
+                              type: "button",
+                              color: "neutral",
+                              variant: "ghost",
+                              onClick: toggleEdit
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode("Cancel")
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UButton, {
+                              type: "submit",
+                              color: "primary",
+                              icon: "i-lucide-check",
+                              loading: isSubmitting.value,
+                              disabled: isSubmitting.value
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode(" Save Changes ")
+                              ]),
+                              _: 1
+                            }, 8, ["loading", "disabled"])
+                          ])
+                        ], 32)),
+                        unref(error) ? (openBlock(), createBlock("div", {
+                          key: 2,
+                          class: "mt-4 text-sm text-error"
+                        }, "Failed to load user.")) : createCommentVNode("", true)
+                      ]),
+                      _: 1
+                    }),
+                    createVNode("div", { class: "flex gap-3" }, [
+                      createVNode(_component_UButton, {
+                        color: "neutral",
+                        variant: "ghost",
+                        to: "/admin/users"
+                      }, {
+                        default: withCtx(() => [
+                          createTextVNode("Back to list")
+                        ]),
+                        _: 1
+                      }),
+                      createVNode(_component_UButton, {
+                        size: "sm",
+                        icon: "i-lucide-refresh-ccw",
+                        variant: "outline",
+                        onClick: unref(refresh)
+                      }, {
+                        default: withCtx(() => [
+                          createTextVNode("Refresh")
+                        ]),
+                        _: 1
+                      }, 8, ["onClick"])
+                    ])
+                  ])
+                ]),
+                _: 1
+              })
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+    };
+  }
+});
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/admin/categories/[id].vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+
+export { _sfc_main as default };
+//# sourceMappingURL=_id_-B4yWrdFy.mjs.map

@@ -1,0 +1,920 @@
+import { _ as _sfc_main$e, a as __nuxt_component_1, b as __nuxt_component_2, c as _sfc_main$6 } from './navbar-DByaTdfk.mjs';
+import { b as _sfc_main$1 } from './usePortal-BKdXuyUd.mjs';
+import { _ as _sfc_main$2 } from './Card-o7xn3WFg.mjs';
+import { _ as _sfc_main$3 } from './Select-Dv6KDMrI.mjs';
+import { _ as __nuxt_component_7, u as updateTicketStatus } from './updateTicketStatus-Da378j06.mjs';
+import { _ as _sfc_main$4 } from './Alert-D75idXAT.mjs';
+import { defineComponent, computed, ref, reactive, withAsyncContext, watchEffect, resolveComponent, withCtx, unref, createTextVNode, toDisplayString, createVNode, createBlock, openBlock, Fragment, createCommentVNode, renderList, useSSRContext } from 'vue';
+import { ssrRenderComponent, ssrInterpolate, ssrRenderList, ssrRenderAttr } from 'vue/server-renderer';
+import { g as getTicketById } from './tickets-BxG6Zsyw.mjs';
+import { d as useRoute } from './server.mjs';
+import { u as useAsyncData } from './index-Db0gMLsE.mjs';
+import 'reka-ui';
+import '../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import '@iconify/utils';
+import 'consola';
+import '@vueuse/core';
+import 'vaul-vue';
+import 'reka-ui/namespaced';
+import './nuxt-link-Bj7IzWuU.mjs';
+import 'tailwind-variants';
+import './Input-u_sFkXpR.mjs';
+import 'vue-router';
+import 'tailwindcss/colors';
+import '@iconify/vue';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import '@iconify/utils/lib/css/icon';
+import 'perfect-debounce';
+
+const _sfc_main = /* @__PURE__ */ defineComponent({
+  __name: "[id]",
+  __ssrInlineRender: true,
+  async setup(__props) {
+    let __temp, __restore;
+    const route = useRoute();
+    const ticketId = computed(() => route.params.id);
+    const isEditing = ref(false);
+    const isSubmitting = ref(false);
+    const form = reactive({
+      status: "",
+      priority: "",
+      technicianId: ""
+    });
+    const statusOptions = ["open", "in_progress", "pending", "resolved", "closed"];
+    const { data: ticket, status, refresh, error } = ([__temp, __restore] = withAsyncContext(() => useAsyncData(
+      () => getTicketById(ticketId.value),
+      {
+        watch: [ticketId],
+        server: false
+      },
+      "$9dGDsD_3P5"
+    )), __temp = await __temp, __restore(), __temp);
+    computed(() => {
+      return (users.value || []).map((u) => ({ label: u.username || u.email || `Tech #${u.id}`, value: String(u.id) }));
+    });
+    const resolveFileUrl = (file) => {
+      const raw = file?.url || file?.path || file?.file_path || file?.attachment_url || file?.location;
+      if (!raw) return "";
+      if (/^https?:\/\//i.test(raw)) return raw;
+      const base = "http://localhost:8000/storage/";
+      const cleaned = String(raw).replace(/^\/+/, "");
+      if (cleaned.startsWith("storage/")) return `${base}/${cleaned}`;
+      if (cleaned.startsWith("attachments/")) return `${base}/storage/${cleaned}`;
+      if (cleaned.startsWith("storage\\")) return `${base}/${cleaned.replace("\\", "/")}`;
+      return `${base}/${cleaned}`;
+    };
+    const displayAttachments = computed(() => {
+      const files = ticket.value?.attachments || ticket.value?.files || ticket.value?.attachments?.data || ticket.value?.media || ticket.value?.documents || [];
+      return (files || []).map((file) => ({
+        url: resolveFileUrl(file),
+        name: file?.name || file?.filename || file?.original_name || file?.file_name || file?.display_name || file?.path || file?.url || "File",
+        type: file?.mime_type || file?.type || ""
+      })).filter((f) => f.url);
+    });
+    computed(() => {
+      if (!ticket.value) return null;
+      const techId = ticket.value.assigned_tech_id || ticket.value.technician_id;
+      if (!techId) return null;
+      return (users.value || []).find((u) => u.id == techId);
+    });
+    const elapsedTime = ref("");
+    watchEffect(() => {
+      if (ticket.value) {
+        form.status = ticket.value.status || "";
+        form.priority = ticket.value.priority || "";
+        const techId = ticket.value.assigned_tech_id || ticket.value.technician_id || ticket.value.technicianId || ticket.value.technician?.id;
+        form.technicianId = techId ? String(techId) : "";
+      }
+    });
+    const toggleEdit = () => {
+      isEditing.value = !isEditing.value;
+      if (!isEditing.value && ticket.value) {
+        form.status = ticket.value.status || "";
+        form.priority = ticket.value.priority || "";
+        const techId = ticket.value.assigned_tech_id || ticket.value.technician_id || ticket.value.technicianId || ticket.value.technician?.id;
+        form.technicianId = techId ? String(techId) : "";
+      }
+    };
+    const handleSave = async () => {
+      if (isSubmitting.value || !ticketId.value) return;
+      isSubmitting.value = true;
+      try {
+        const payload = {
+          status: form.status || void 0,
+          priority: form.priority || void 0,
+          assigned_tech_id: form.technicianId ? Number(form.technicianId) : void 0
+        };
+        await updateTicketStatus(ticketId.value, form.status);
+        await refresh();
+        isEditing.value = false;
+      } catch (err) {
+        console.error("Failed to update ticket", err);
+      } finally {
+        isSubmitting.value = false;
+      }
+    };
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UDashboardGroup = _sfc_main$e;
+      const _component_Sidebar = __nuxt_component_1;
+      const _component_UDashboardPage = resolveComponent("UDashboardPage");
+      const _component_Navbar = __nuxt_component_2;
+      const _component_UDashboardPageHeader = resolveComponent("UDashboardPageHeader");
+      const _component_UButton = _sfc_main$1;
+      const _component_UCard = _sfc_main$2;
+      const _component_UBadge = _sfc_main$6;
+      const _component_UFormGroup = resolveComponent("UFormGroup");
+      const _component_USelect = _sfc_main$3;
+      const _component_TicketComments = __nuxt_component_7;
+      const _component_UAlert = _sfc_main$4;
+      _push(ssrRenderComponent(_component_UDashboardGroup, _attrs, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(ssrRenderComponent(_component_Sidebar, null, null, _parent2, _scopeId));
+            _push2(ssrRenderComponent(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+              default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                if (_push3) {
+                  _push3(ssrRenderComponent(_component_Navbar, {
+                    title: "Ticket",
+                    icon: "i-lucide-ticket",
+                    class: "w-full"
+                  }, null, _parent3, _scopeId2));
+                  _push3(`<div class="flex flex-col flex-1 gap-6 p-6 overflow-auto"${_scopeId2}><div class="flex items-center justify-between gap-3"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UDashboardPageHeader, {
+                    title: unref(ticket) ? `Ticket #${unref(ticket).id}` : "Ticket",
+                    description: unref(ticket)?.title || "Ticket details"
+                  }, null, _parent3, _scopeId2));
+                  _push3(`<div class="flex gap-2"${_scopeId2}>`);
+                  _push3(ssrRenderComponent(_component_UButton, {
+                    size: "sm",
+                    icon: unref(isEditing) ? "i-lucide-x" : "i-lucide-pencil",
+                    color: unref(isEditing) ? "neutral" : "primary",
+                    onClick: toggleEdit
+                  }, {
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(`${ssrInterpolate(unref(isEditing) ? "Cancel" : "Edit")}`);
+                      } else {
+                        return [
+                          createTextVNode(toDisplayString(unref(isEditing) ? "Cancel" : "Edit"), 1)
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_UButton, {
+                    color: "neutral",
+                    variant: "ghost",
+                    icon: "i-lucide-arrow-left",
+                    to: "/supervisor/tickets"
+                  }, {
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        _push4(` Back `);
+                      } else {
+                        return [
+                          createTextVNode(" Back ")
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(`</div></div>`);
+                  _push3(ssrRenderComponent(_component_UCard, {
+                    ui: { body: "grid gap-4 sm:grid-cols-2" },
+                    loading: unref(status) === "pending"
+                  }, {
+                    default: withCtx((_3, _push4, _parent4, _scopeId3) => {
+                      if (_push4) {
+                        if (!unref(isEditing)) {
+                          _push4(`<!--[--><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Title</p><p class="text-base font-medium text-gray-900"${_scopeId3}>${ssrInterpolate(unref(ticket)?.title || "-")}</p></div><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Status</p>`);
+                          _push4(ssrRenderComponent(_component_UBadge, {
+                            color: "primary",
+                            variant: "soft"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(`${ssrInterpolate(unref(ticket)?.status || "-")}`);
+                              } else {
+                                return [
+                                  createTextVNode(toDisplayString(unref(ticket)?.status || "-"), 1)
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(`</div><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Time Elapsed</p><p class="text-base text-gray-900 font-mono"${_scopeId3}>${ssrInterpolate(unref(elapsedTime))}</p></div><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Priority</p><p class="text-base text-gray-900"${_scopeId3}>${ssrInterpolate(unref(ticket)?.priority || "-")}</p></div><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Technician</p><p class="text-base text-gray-900"${_scopeId3}>${ssrInterpolate(_ctx.technicianDisplayName)}</p></div><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Category</p><p class="text-base text-gray-900"${_scopeId3}>${ssrInterpolate(unref(ticket)?.category?.name || "-")}</p></div><div class="space-y-1 sm:col-span-2"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Description</p><p class="text-base text-gray-900 whitespace-pre-line"${_scopeId3}>${ssrInterpolate(unref(ticket)?.description || "-")}</p></div>`);
+                          if (unref(displayAttachments).length) {
+                            _push4(`<div class="space-y-1 sm:col-span-2"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Attachments</p><div class="flex flex-wrap gap-4"${_scopeId3}><!--[-->`);
+                            ssrRenderList(unref(displayAttachments), (file) => {
+                              _push4(`<div class="flex flex-col items-center w-32"${_scopeId3}>`);
+                              if (file.url && (file.url.endsWith(".png") || file.url.endsWith(".jpg") || file.url.endsWith(".jpeg") || file.url.endsWith(".gif"))) {
+                                _push4(`<img${ssrRenderAttr("src", file.url)}${ssrRenderAttr("alt", file.name)} class="w-28 h-28 object-cover rounded border"${_scopeId3}>`);
+                              } else if (file.url && file.url.endsWith(".pdf")) {
+                                _push4(`<embed${ssrRenderAttr("src", file.url)} type="application/pdf" class="w-28 h-28 border rounded"${_scopeId3}>`);
+                              } else {
+                                _push4(`<span class="i-lucide-file text-3xl text-gray-400 mb-2"${_scopeId3}></span>`);
+                              }
+                              _push4(`<a${ssrRenderAttr("href", file.url)} target="_blank" class="text-xs text-primary underline mt-1 break-all"${_scopeId3}>${ssrInterpolate(file.name || file.url)}</a></div>`);
+                            });
+                            _push4(`<!--]--></div></div>`);
+                          } else {
+                            _push4(`<!---->`);
+                          }
+                          _push4(`<!--]-->`);
+                        } else {
+                          _push4(`<!--[--><div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Title</p><p class="text-base font-medium text-gray-900"${_scopeId3}>${ssrInterpolate(unref(ticket)?.title || "-")}</p></div>`);
+                          _push4(ssrRenderComponent(_component_UFormGroup, {
+                            label: "Status",
+                            name: "status"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(ssrRenderComponent(_component_USelect, {
+                                  modelValue: unref(form).status,
+                                  "onUpdate:modelValue": ($event) => unref(form).status = $event,
+                                  items: statusOptions,
+                                  placeholder: "Select status"
+                                }, null, _parent5, _scopeId4));
+                              } else {
+                                return [
+                                  createVNode(_component_USelect, {
+                                    modelValue: unref(form).status,
+                                    "onUpdate:modelValue": ($event) => unref(form).status = $event,
+                                    items: statusOptions,
+                                    placeholder: "Select status"
+                                  }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(ssrRenderComponent(_component_UFormGroup, {
+                            label: "Priority",
+                            name: "priority"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(`<p class="text-base text-gray-900"${_scopeId4}>${ssrInterpolate(unref(ticket)?.priority || "-")}</p>`);
+                              } else {
+                                return [
+                                  createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(ssrRenderComponent(_component_UFormGroup, {
+                            label: "Assign technician",
+                            name: "technician"
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(`<p class="text-base text-gray-900"${_scopeId4}>${ssrInterpolate(_ctx.technicianDisplayName)}</p>`);
+                              } else {
+                                return [
+                                  createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(`<div class="space-y-1"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Category</p><p class="text-base text-gray-900"${_scopeId3}>${ssrInterpolate(unref(ticket)?.category?.name || "-")}</p></div><div class="space-y-1 sm:col-span-2"${_scopeId3}><p class="text-xs text-muted-500"${_scopeId3}>Description</p><p class="text-base text-gray-900 whitespace-pre-line"${_scopeId3}>${ssrInterpolate(unref(ticket)?.description || "-")}</p></div><div class="sm:col-span-2 flex justify-end gap-3 pt-2"${_scopeId3}>`);
+                          _push4(ssrRenderComponent(_component_UButton, {
+                            type: "button",
+                            color: "neutral",
+                            variant: "ghost",
+                            onClick: toggleEdit
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(`Cancel`);
+                              } else {
+                                return [
+                                  createTextVNode("Cancel")
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(ssrRenderComponent(_component_UButton, {
+                            type: "button",
+                            color: "primary",
+                            icon: "i-lucide-check",
+                            loading: unref(isSubmitting),
+                            disabled: unref(isSubmitting),
+                            onClick: handleSave
+                          }, {
+                            default: withCtx((_4, _push5, _parent5, _scopeId4) => {
+                              if (_push5) {
+                                _push5(` Save Changes `);
+                              } else {
+                                return [
+                                  createTextVNode(" Save Changes ")
+                                ];
+                              }
+                            }),
+                            _: 1
+                          }, _parent4, _scopeId3));
+                          _push4(`</div><!--]-->`);
+                        }
+                      } else {
+                        return [
+                          !unref(isEditing) ? (openBlock(), createBlock(Fragment, { key: 0 }, [
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Title"),
+                              createVNode("p", { class: "text-base font-medium text-gray-900" }, toDisplayString(unref(ticket)?.title || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Status"),
+                              createVNode(_component_UBadge, {
+                                color: "primary",
+                                variant: "soft"
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(unref(ticket)?.status || "-"), 1)
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Time Elapsed"),
+                              createVNode("p", { class: "text-base text-gray-900 font-mono" }, toDisplayString(unref(elapsedTime)), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Priority"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Technician"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Category"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.category?.name || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1 sm:col-span-2" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Description"),
+                              createVNode("p", { class: "text-base text-gray-900 whitespace-pre-line" }, toDisplayString(unref(ticket)?.description || "-"), 1)
+                            ]),
+                            unref(displayAttachments).length ? (openBlock(), createBlock("div", {
+                              key: 0,
+                              class: "space-y-1 sm:col-span-2"
+                            }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Attachments"),
+                              createVNode("div", { class: "flex flex-wrap gap-4" }, [
+                                (openBlock(true), createBlock(Fragment, null, renderList(unref(displayAttachments), (file) => {
+                                  return openBlock(), createBlock("div", {
+                                    key: file.url || file.name,
+                                    class: "flex flex-col items-center w-32"
+                                  }, [
+                                    file.url && (file.url.endsWith(".png") || file.url.endsWith(".jpg") || file.url.endsWith(".jpeg") || file.url.endsWith(".gif")) ? (openBlock(), createBlock("img", {
+                                      key: 0,
+                                      src: file.url,
+                                      alt: file.name,
+                                      class: "w-28 h-28 object-cover rounded border"
+                                    }, null, 8, ["src", "alt"])) : file.url && file.url.endsWith(".pdf") ? (openBlock(), createBlock("embed", {
+                                      key: 1,
+                                      src: file.url,
+                                      type: "application/pdf",
+                                      class: "w-28 h-28 border rounded"
+                                    }, null, 8, ["src"])) : (openBlock(), createBlock("span", {
+                                      key: 2,
+                                      class: "i-lucide-file text-3xl text-gray-400 mb-2"
+                                    })),
+                                    createVNode("a", {
+                                      href: file.url,
+                                      target: "_blank",
+                                      class: "text-xs text-primary underline mt-1 break-all"
+                                    }, toDisplayString(file.name || file.url), 9, ["href"])
+                                  ]);
+                                }), 128))
+                              ])
+                            ])) : createCommentVNode("", true)
+                          ], 64)) : (openBlock(), createBlock(Fragment, { key: 1 }, [
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Title"),
+                              createVNode("p", { class: "text-base font-medium text-gray-900" }, toDisplayString(unref(ticket)?.title || "-"), 1)
+                            ]),
+                            createVNode(_component_UFormGroup, {
+                              label: "Status",
+                              name: "status"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode(_component_USelect, {
+                                  modelValue: unref(form).status,
+                                  "onUpdate:modelValue": ($event) => unref(form).status = $event,
+                                  items: statusOptions,
+                                  placeholder: "Select status"
+                                }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UFormGroup, {
+                              label: "Priority",
+                              name: "priority"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UFormGroup, {
+                              label: "Assign technician",
+                              name: "technician"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                              ]),
+                              _: 1
+                            }),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Category"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.category?.name || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1 sm:col-span-2" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Description"),
+                              createVNode("p", { class: "text-base text-gray-900 whitespace-pre-line" }, toDisplayString(unref(ticket)?.description || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "sm:col-span-2 flex justify-end gap-3 pt-2" }, [
+                              createVNode(_component_UButton, {
+                                type: "button",
+                                color: "neutral",
+                                variant: "ghost",
+                                onClick: toggleEdit
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode("Cancel")
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_UButton, {
+                                type: "button",
+                                color: "primary",
+                                icon: "i-lucide-check",
+                                loading: unref(isSubmitting),
+                                disabled: unref(isSubmitting),
+                                onClick: handleSave
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(" Save Changes ")
+                                ]),
+                                _: 1
+                              }, 8, ["loading", "disabled"])
+                            ])
+                          ], 64))
+                        ];
+                      }
+                    }),
+                    _: 1
+                  }, _parent3, _scopeId2));
+                  _push3(ssrRenderComponent(_component_TicketComments, { "ticket-id": unref(ticketId) }, null, _parent3, _scopeId2));
+                  if (unref(error)) {
+                    _push3(ssrRenderComponent(_component_UAlert, {
+                      icon: "i-lucide-alert-triangle",
+                      color: "red",
+                      variant: "soft",
+                      title: "Unable to load ticket",
+                      description: unref(error)?.message || "Please try again."
+                    }, null, _parent3, _scopeId2));
+                  } else {
+                    _push3(`<!---->`);
+                  }
+                  _push3(`</div>`);
+                } else {
+                  return [
+                    createVNode(_component_Navbar, {
+                      title: "Ticket",
+                      icon: "i-lucide-ticket",
+                      class: "w-full"
+                    }),
+                    createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                      createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                        createVNode(_component_UDashboardPageHeader, {
+                          title: unref(ticket) ? `Ticket #${unref(ticket).id}` : "Ticket",
+                          description: unref(ticket)?.title || "Ticket details"
+                        }, null, 8, ["title", "description"]),
+                        createVNode("div", { class: "flex gap-2" }, [
+                          createVNode(_component_UButton, {
+                            size: "sm",
+                            icon: unref(isEditing) ? "i-lucide-x" : "i-lucide-pencil",
+                            color: unref(isEditing) ? "neutral" : "primary",
+                            onClick: toggleEdit
+                          }, {
+                            default: withCtx(() => [
+                              createTextVNode(toDisplayString(unref(isEditing) ? "Cancel" : "Edit"), 1)
+                            ]),
+                            _: 1
+                          }, 8, ["icon", "color"]),
+                          createVNode(_component_UButton, {
+                            color: "neutral",
+                            variant: "ghost",
+                            icon: "i-lucide-arrow-left",
+                            to: "/supervisor/tickets"
+                          }, {
+                            default: withCtx(() => [
+                              createTextVNode(" Back ")
+                            ]),
+                            _: 1
+                          })
+                        ])
+                      ]),
+                      createVNode(_component_UCard, {
+                        ui: { body: "grid gap-4 sm:grid-cols-2" },
+                        loading: unref(status) === "pending"
+                      }, {
+                        default: withCtx(() => [
+                          !unref(isEditing) ? (openBlock(), createBlock(Fragment, { key: 0 }, [
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Title"),
+                              createVNode("p", { class: "text-base font-medium text-gray-900" }, toDisplayString(unref(ticket)?.title || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Status"),
+                              createVNode(_component_UBadge, {
+                                color: "primary",
+                                variant: "soft"
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(toDisplayString(unref(ticket)?.status || "-"), 1)
+                                ]),
+                                _: 1
+                              })
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Time Elapsed"),
+                              createVNode("p", { class: "text-base text-gray-900 font-mono" }, toDisplayString(unref(elapsedTime)), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Priority"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Technician"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Category"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.category?.name || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1 sm:col-span-2" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Description"),
+                              createVNode("p", { class: "text-base text-gray-900 whitespace-pre-line" }, toDisplayString(unref(ticket)?.description || "-"), 1)
+                            ]),
+                            unref(displayAttachments).length ? (openBlock(), createBlock("div", {
+                              key: 0,
+                              class: "space-y-1 sm:col-span-2"
+                            }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Attachments"),
+                              createVNode("div", { class: "flex flex-wrap gap-4" }, [
+                                (openBlock(true), createBlock(Fragment, null, renderList(unref(displayAttachments), (file) => {
+                                  return openBlock(), createBlock("div", {
+                                    key: file.url || file.name,
+                                    class: "flex flex-col items-center w-32"
+                                  }, [
+                                    file.url && (file.url.endsWith(".png") || file.url.endsWith(".jpg") || file.url.endsWith(".jpeg") || file.url.endsWith(".gif")) ? (openBlock(), createBlock("img", {
+                                      key: 0,
+                                      src: file.url,
+                                      alt: file.name,
+                                      class: "w-28 h-28 object-cover rounded border"
+                                    }, null, 8, ["src", "alt"])) : file.url && file.url.endsWith(".pdf") ? (openBlock(), createBlock("embed", {
+                                      key: 1,
+                                      src: file.url,
+                                      type: "application/pdf",
+                                      class: "w-28 h-28 border rounded"
+                                    }, null, 8, ["src"])) : (openBlock(), createBlock("span", {
+                                      key: 2,
+                                      class: "i-lucide-file text-3xl text-gray-400 mb-2"
+                                    })),
+                                    createVNode("a", {
+                                      href: file.url,
+                                      target: "_blank",
+                                      class: "text-xs text-primary underline mt-1 break-all"
+                                    }, toDisplayString(file.name || file.url), 9, ["href"])
+                                  ]);
+                                }), 128))
+                              ])
+                            ])) : createCommentVNode("", true)
+                          ], 64)) : (openBlock(), createBlock(Fragment, { key: 1 }, [
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Title"),
+                              createVNode("p", { class: "text-base font-medium text-gray-900" }, toDisplayString(unref(ticket)?.title || "-"), 1)
+                            ]),
+                            createVNode(_component_UFormGroup, {
+                              label: "Status",
+                              name: "status"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode(_component_USelect, {
+                                  modelValue: unref(form).status,
+                                  "onUpdate:modelValue": ($event) => unref(form).status = $event,
+                                  items: statusOptions,
+                                  placeholder: "Select status"
+                                }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UFormGroup, {
+                              label: "Priority",
+                              name: "priority"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UFormGroup, {
+                              label: "Assign technician",
+                              name: "technician"
+                            }, {
+                              default: withCtx(() => [
+                                createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                              ]),
+                              _: 1
+                            }),
+                            createVNode("div", { class: "space-y-1" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Category"),
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.category?.name || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "space-y-1 sm:col-span-2" }, [
+                              createVNode("p", { class: "text-xs text-muted-500" }, "Description"),
+                              createVNode("p", { class: "text-base text-gray-900 whitespace-pre-line" }, toDisplayString(unref(ticket)?.description || "-"), 1)
+                            ]),
+                            createVNode("div", { class: "sm:col-span-2 flex justify-end gap-3 pt-2" }, [
+                              createVNode(_component_UButton, {
+                                type: "button",
+                                color: "neutral",
+                                variant: "ghost",
+                                onClick: toggleEdit
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode("Cancel")
+                                ]),
+                                _: 1
+                              }),
+                              createVNode(_component_UButton, {
+                                type: "button",
+                                color: "primary",
+                                icon: "i-lucide-check",
+                                loading: unref(isSubmitting),
+                                disabled: unref(isSubmitting),
+                                onClick: handleSave
+                              }, {
+                                default: withCtx(() => [
+                                  createTextVNode(" Save Changes ")
+                                ]),
+                                _: 1
+                              }, 8, ["loading", "disabled"])
+                            ])
+                          ], 64))
+                        ]),
+                        _: 1
+                      }, 8, ["loading"]),
+                      createVNode(_component_TicketComments, { "ticket-id": unref(ticketId) }, null, 8, ["ticket-id"]),
+                      unref(error) ? (openBlock(), createBlock(_component_UAlert, {
+                        key: 0,
+                        icon: "i-lucide-alert-triangle",
+                        color: "red",
+                        variant: "soft",
+                        title: "Unable to load ticket",
+                        description: unref(error)?.message || "Please try again."
+                      }, null, 8, ["description"])) : createCommentVNode("", true)
+                    ])
+                  ];
+                }
+              }),
+              _: 1
+            }, _parent2, _scopeId));
+          } else {
+            return [
+              createVNode(_component_Sidebar),
+              createVNode(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+                default: withCtx(() => [
+                  createVNode(_component_Navbar, {
+                    title: "Ticket",
+                    icon: "i-lucide-ticket",
+                    class: "w-full"
+                  }),
+                  createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                    createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                      createVNode(_component_UDashboardPageHeader, {
+                        title: unref(ticket) ? `Ticket #${unref(ticket).id}` : "Ticket",
+                        description: unref(ticket)?.title || "Ticket details"
+                      }, null, 8, ["title", "description"]),
+                      createVNode("div", { class: "flex gap-2" }, [
+                        createVNode(_component_UButton, {
+                          size: "sm",
+                          icon: unref(isEditing) ? "i-lucide-x" : "i-lucide-pencil",
+                          color: unref(isEditing) ? "neutral" : "primary",
+                          onClick: toggleEdit
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode(toDisplayString(unref(isEditing) ? "Cancel" : "Edit"), 1)
+                          ]),
+                          _: 1
+                        }, 8, ["icon", "color"]),
+                        createVNode(_component_UButton, {
+                          color: "neutral",
+                          variant: "ghost",
+                          icon: "i-lucide-arrow-left",
+                          to: "/supervisor/tickets"
+                        }, {
+                          default: withCtx(() => [
+                            createTextVNode(" Back ")
+                          ]),
+                          _: 1
+                        })
+                      ])
+                    ]),
+                    createVNode(_component_UCard, {
+                      ui: { body: "grid gap-4 sm:grid-cols-2" },
+                      loading: unref(status) === "pending"
+                    }, {
+                      default: withCtx(() => [
+                        !unref(isEditing) ? (openBlock(), createBlock(Fragment, { key: 0 }, [
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Title"),
+                            createVNode("p", { class: "text-base font-medium text-gray-900" }, toDisplayString(unref(ticket)?.title || "-"), 1)
+                          ]),
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Status"),
+                            createVNode(_component_UBadge, {
+                              color: "primary",
+                              variant: "soft"
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode(toDisplayString(unref(ticket)?.status || "-"), 1)
+                              ]),
+                              _: 1
+                            })
+                          ]),
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Time Elapsed"),
+                            createVNode("p", { class: "text-base text-gray-900 font-mono" }, toDisplayString(unref(elapsedTime)), 1)
+                          ]),
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Priority"),
+                            createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                          ]),
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Technician"),
+                            createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                          ]),
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Category"),
+                            createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.category?.name || "-"), 1)
+                          ]),
+                          createVNode("div", { class: "space-y-1 sm:col-span-2" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Description"),
+                            createVNode("p", { class: "text-base text-gray-900 whitespace-pre-line" }, toDisplayString(unref(ticket)?.description || "-"), 1)
+                          ]),
+                          unref(displayAttachments).length ? (openBlock(), createBlock("div", {
+                            key: 0,
+                            class: "space-y-1 sm:col-span-2"
+                          }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Attachments"),
+                            createVNode("div", { class: "flex flex-wrap gap-4" }, [
+                              (openBlock(true), createBlock(Fragment, null, renderList(unref(displayAttachments), (file) => {
+                                return openBlock(), createBlock("div", {
+                                  key: file.url || file.name,
+                                  class: "flex flex-col items-center w-32"
+                                }, [
+                                  file.url && (file.url.endsWith(".png") || file.url.endsWith(".jpg") || file.url.endsWith(".jpeg") || file.url.endsWith(".gif")) ? (openBlock(), createBlock("img", {
+                                    key: 0,
+                                    src: file.url,
+                                    alt: file.name,
+                                    class: "w-28 h-28 object-cover rounded border"
+                                  }, null, 8, ["src", "alt"])) : file.url && file.url.endsWith(".pdf") ? (openBlock(), createBlock("embed", {
+                                    key: 1,
+                                    src: file.url,
+                                    type: "application/pdf",
+                                    class: "w-28 h-28 border rounded"
+                                  }, null, 8, ["src"])) : (openBlock(), createBlock("span", {
+                                    key: 2,
+                                    class: "i-lucide-file text-3xl text-gray-400 mb-2"
+                                  })),
+                                  createVNode("a", {
+                                    href: file.url,
+                                    target: "_blank",
+                                    class: "text-xs text-primary underline mt-1 break-all"
+                                  }, toDisplayString(file.name || file.url), 9, ["href"])
+                                ]);
+                              }), 128))
+                            ])
+                          ])) : createCommentVNode("", true)
+                        ], 64)) : (openBlock(), createBlock(Fragment, { key: 1 }, [
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Title"),
+                            createVNode("p", { class: "text-base font-medium text-gray-900" }, toDisplayString(unref(ticket)?.title || "-"), 1)
+                          ]),
+                          createVNode(_component_UFormGroup, {
+                            label: "Status",
+                            name: "status"
+                          }, {
+                            default: withCtx(() => [
+                              createVNode(_component_USelect, {
+                                modelValue: unref(form).status,
+                                "onUpdate:modelValue": ($event) => unref(form).status = $event,
+                                items: statusOptions,
+                                placeholder: "Select status"
+                              }, null, 8, ["modelValue", "onUpdate:modelValue"])
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_UFormGroup, {
+                            label: "Priority",
+                            name: "priority"
+                          }, {
+                            default: withCtx(() => [
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.priority || "-"), 1)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode(_component_UFormGroup, {
+                            label: "Assign technician",
+                            name: "technician"
+                          }, {
+                            default: withCtx(() => [
+                              createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(_ctx.technicianDisplayName), 1)
+                            ]),
+                            _: 1
+                          }),
+                          createVNode("div", { class: "space-y-1" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Category"),
+                            createVNode("p", { class: "text-base text-gray-900" }, toDisplayString(unref(ticket)?.category?.name || "-"), 1)
+                          ]),
+                          createVNode("div", { class: "space-y-1 sm:col-span-2" }, [
+                            createVNode("p", { class: "text-xs text-muted-500" }, "Description"),
+                            createVNode("p", { class: "text-base text-gray-900 whitespace-pre-line" }, toDisplayString(unref(ticket)?.description || "-"), 1)
+                          ]),
+                          createVNode("div", { class: "sm:col-span-2 flex justify-end gap-3 pt-2" }, [
+                            createVNode(_component_UButton, {
+                              type: "button",
+                              color: "neutral",
+                              variant: "ghost",
+                              onClick: toggleEdit
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode("Cancel")
+                              ]),
+                              _: 1
+                            }),
+                            createVNode(_component_UButton, {
+                              type: "button",
+                              color: "primary",
+                              icon: "i-lucide-check",
+                              loading: unref(isSubmitting),
+                              disabled: unref(isSubmitting),
+                              onClick: handleSave
+                            }, {
+                              default: withCtx(() => [
+                                createTextVNode(" Save Changes ")
+                              ]),
+                              _: 1
+                            }, 8, ["loading", "disabled"])
+                          ])
+                        ], 64))
+                      ]),
+                      _: 1
+                    }, 8, ["loading"]),
+                    createVNode(_component_TicketComments, { "ticket-id": unref(ticketId) }, null, 8, ["ticket-id"]),
+                    unref(error) ? (openBlock(), createBlock(_component_UAlert, {
+                      key: 0,
+                      icon: "i-lucide-alert-triangle",
+                      color: "red",
+                      variant: "soft",
+                      title: "Unable to load ticket",
+                      description: unref(error)?.message || "Please try again."
+                    }, null, 8, ["description"])) : createCommentVNode("", true)
+                  ])
+                ]),
+                _: 1
+              })
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+    };
+  }
+});
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/technician/tickets/[id].vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+
+export { _sfc_main as default };
+//# sourceMappingURL=_id_-DZu1JBN8.mjs.map

@@ -1,0 +1,282 @@
+import { _ as _sfc_main$e, a as __nuxt_component_1, b as __nuxt_component_2, c as _sfc_main$6 } from './navbar-DByaTdfk.mjs';
+import { _ as _sfc_main$2 } from './Card-o7xn3WFg.mjs';
+import { _ as _sfc_main$3 } from './usePortal-BKdXuyUd.mjs';
+import { resolveComponent, withCtx, createVNode, defineComponent, reactive, mergeProps, createTextVNode, toDisplayString, useSSRContext } from 'vue';
+import { ssrRenderComponent, ssrRenderAttrs, ssrRenderList, ssrInterpolate, ssrRenderClass } from 'vue/server-renderer';
+import { _ as _export_sfc } from './server.mjs';
+import { _ as __nuxt_component_3$1 } from './ticketsTable-DiR1u5h5.mjs';
+import 'reka-ui';
+import '../nitro/nitro.mjs';
+import 'node:http';
+import 'node:https';
+import 'node:events';
+import 'node:buffer';
+import 'node:fs';
+import 'node:path';
+import 'node:crypto';
+import 'node:url';
+import '@iconify/utils';
+import 'consola';
+import '@vueuse/core';
+import 'vaul-vue';
+import 'reka-ui/namespaced';
+import './nuxt-link-Bj7IzWuU.mjs';
+import 'tailwind-variants';
+import './index-Db0gMLsE.mjs';
+import '@iconify/vue';
+import '@iconify/utils/lib/css/icon';
+import 'perfect-debounce';
+import 'vue-router';
+import 'tailwindcss/colors';
+import '../routes/renderer.mjs';
+import 'vue-bundle-renderer/runtime';
+import 'unhead/server';
+import 'devalue';
+import 'unhead/utils';
+import './Table-jij3JVau.mjs';
+import '@tanstack/vue-table';
+import '@tanstack/vue-virtual';
+import './tickets-BxG6Zsyw.mjs';
+
+const _sfc_main$1 = /* @__PURE__ */ defineComponent({
+  __name: "SupervisorDashboard",
+  __ssrInlineRender: true,
+  setup(__props) {
+    const cards = reactive([
+      {
+        key: "open",
+        label: "Open tickets",
+        value: 0,
+        icon: "i-lucide-flame",
+        iconBg: "bg-amber-500",
+        badgeColor: "amber",
+        dot: "bg-amber-500"
+      },
+      {
+        key: "pending",
+        label: "Pending tickets",
+        value: 0,
+        icon: "i-lucide-clock-3",
+        iconBg: "bg-sky-500",
+        badgeColor: "sky",
+        dot: "bg-sky-500"
+      },
+      {
+        key: "closed",
+        label: "Closed tickets",
+        value: 0,
+        icon: "i-lucide-check-circle-2",
+        iconBg: "bg-emerald-500",
+        badgeColor: "emerald",
+        dot: "bg-emerald-500"
+      }
+    ]);
+    return (_ctx, _push, _parent, _attrs) => {
+      const _component_UBadge = _sfc_main$6;
+      const _component_UCard = _sfc_main$2;
+      const _component_UIcon = _sfc_main$3;
+      _push(`<section${ssrRenderAttrs(mergeProps({ class: "space-y-4" }, _attrs))}><div class="flex items-center justify-between gap-3"><div class="space-y-0.5"><p class="text-sm text-muted-500">Supervisor</p><h2 class="text-lg font-semibold text-gray-900">Ticket status</h2><p class="text-sm text-muted-500">Snapshot of tickets by status</p></div>`);
+      _push(ssrRenderComponent(_component_UBadge, {
+        color: "primary",
+        variant: "soft",
+        icon: "i-lucide-activity"
+      }, {
+        default: withCtx((_, _push2, _parent2, _scopeId) => {
+          if (_push2) {
+            _push2(`Live`);
+          } else {
+            return [
+              createTextVNode("Live")
+            ];
+          }
+        }),
+        _: 1
+      }, _parent));
+      _push(`</div><div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3"><!--[-->`);
+      ssrRenderList(cards, (card) => {
+        _push(ssrRenderComponent(_component_UCard, {
+          key: card.key,
+          class: "h-full",
+          ui: {
+            body: "flex flex-col gap-3",
+            background: "bg-white"
+          }
+        }, {
+          default: withCtx((_, _push2, _parent2, _scopeId) => {
+            if (_push2) {
+              _push2(`<div class="flex items-start justify-between"${_scopeId}><div class="space-y-1"${_scopeId}><p class="text-xs font-semibold uppercase tracking-wide text-muted-500"${_scopeId}>${ssrInterpolate(card.label)}</p><p class="text-3xl font-semibold text-gray-900"${_scopeId}>${ssrInterpolate(card.value.toLocaleString())}</p><p class="text-sm text-muted-500"${_scopeId}>${ssrInterpolate(card.hint)}</p></div><div class="${ssrRenderClass(["flex h-12 w-12 items-center justify-center rounded-xl text-white", card.iconBg])}"${_scopeId}>`);
+              _push2(ssrRenderComponent(_component_UIcon, {
+                name: card.icon,
+                class: "h-6 w-6"
+              }, null, _parent2, _scopeId));
+              _push2(`</div></div><div class="flex items-center gap-2 text-sm"${_scopeId}>`);
+              _push2(ssrRenderComponent(_component_UBadge, {
+                color: card.badgeColor,
+                variant: "soft",
+                class: "flex items-center gap-2"
+              }, {
+                default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+                  if (_push3) {
+                    _push3(`<span class="${ssrRenderClass(["h-2 w-2 rounded-full", card.dot])}"${_scopeId2}></span> ${ssrInterpolate(card.trend)}`);
+                  } else {
+                    return [
+                      createVNode("span", {
+                        class: ["h-2 w-2 rounded-full", card.dot]
+                      }, null, 2),
+                      createTextVNode(" " + toDisplayString(card.trend), 1)
+                    ];
+                  }
+                }),
+                _: 2
+              }, _parent2, _scopeId));
+              _push2(`<span class="text-muted-500"${_scopeId}>${ssrInterpolate(card.note)}</span></div>`);
+            } else {
+              return [
+                createVNode("div", { class: "flex items-start justify-between" }, [
+                  createVNode("div", { class: "space-y-1" }, [
+                    createVNode("p", { class: "text-xs font-semibold uppercase tracking-wide text-muted-500" }, toDisplayString(card.label), 1),
+                    createVNode("p", { class: "text-3xl font-semibold text-gray-900" }, toDisplayString(card.value.toLocaleString()), 1),
+                    createVNode("p", { class: "text-sm text-muted-500" }, toDisplayString(card.hint), 1)
+                  ]),
+                  createVNode("div", {
+                    class: ["flex h-12 w-12 items-center justify-center rounded-xl text-white", card.iconBg]
+                  }, [
+                    createVNode(_component_UIcon, {
+                      name: card.icon,
+                      class: "h-6 w-6"
+                    }, null, 8, ["name"])
+                  ], 2)
+                ]),
+                createVNode("div", { class: "flex items-center gap-2 text-sm" }, [
+                  createVNode(_component_UBadge, {
+                    color: card.badgeColor,
+                    variant: "soft",
+                    class: "flex items-center gap-2"
+                  }, {
+                    default: withCtx(() => [
+                      createVNode("span", {
+                        class: ["h-2 w-2 rounded-full", card.dot]
+                      }, null, 2),
+                      createTextVNode(" " + toDisplayString(card.trend), 1)
+                    ]),
+                    _: 2
+                  }, 1032, ["color"]),
+                  createVNode("span", { class: "text-muted-500" }, toDisplayString(card.note), 1)
+                ])
+              ];
+            }
+          }),
+          _: 2
+        }, _parent));
+      });
+      _push(`<!--]--></div></section>`);
+    };
+  }
+});
+const _sfc_setup$1 = _sfc_main$1.setup;
+_sfc_main$1.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("components/SupervisorDashboard.vue");
+  return _sfc_setup$1 ? _sfc_setup$1(props, ctx) : void 0;
+};
+const __nuxt_component_3 = Object.assign(_sfc_main$1, { __name: "SupervisorDashboard" });
+const _sfc_main = {};
+function _sfc_ssrRender(_ctx, _push, _parent, _attrs) {
+  const _component_UDashboardGroup = _sfc_main$e;
+  const _component_Sidebar = __nuxt_component_1;
+  const _component_UDashboardPage = resolveComponent("UDashboardPage");
+  const _component_Navbar = __nuxt_component_2;
+  const _component_UDashboardPageHeader = resolveComponent("UDashboardPageHeader");
+  const _component_SupervisorDashboard = __nuxt_component_3;
+  const _component_TicketsTable = __nuxt_component_3$1;
+  _push(ssrRenderComponent(_component_UDashboardGroup, _attrs, {
+    default: withCtx((_, _push2, _parent2, _scopeId) => {
+      if (_push2) {
+        _push2(ssrRenderComponent(_component_Sidebar, null, null, _parent2, _scopeId));
+        _push2(ssrRenderComponent(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+          default: withCtx((_2, _push3, _parent3, _scopeId2) => {
+            if (_push3) {
+              _push3(ssrRenderComponent(_component_Navbar, {
+                title: "Dashboard",
+                icon: "i-lucide-house",
+                class: "w-full"
+              }, null, _parent3, _scopeId2));
+              _push3(`<div class="flex flex-col flex-1 gap-6 p-6 overflow-auto"${_scopeId2}><div class="flex items-center justify-between gap-3"${_scopeId2}>`);
+              _push3(ssrRenderComponent(_component_UDashboardPageHeader, {
+                title: "Dashboard",
+                description: "Welcome to your dashboard."
+              }, null, _parent3, _scopeId2));
+              _push3(`</div>`);
+              _push3(ssrRenderComponent(_component_SupervisorDashboard, null, null, _parent3, _scopeId2));
+              _push3(ssrRenderComponent(_component_TicketsTable, {
+                class: "flex-1 w-full",
+                forceStatus: "all"
+              }, null, _parent3, _scopeId2));
+              _push3(`</div>`);
+            } else {
+              return [
+                createVNode(_component_Navbar, {
+                  title: "Dashboard",
+                  icon: "i-lucide-house",
+                  class: "w-full"
+                }),
+                createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                  createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                    createVNode(_component_UDashboardPageHeader, {
+                      title: "Dashboard",
+                      description: "Welcome to your dashboard."
+                    })
+                  ]),
+                  createVNode(_component_SupervisorDashboard),
+                  createVNode(_component_TicketsTable, {
+                    class: "flex-1 w-full",
+                    forceStatus: "all"
+                  })
+                ])
+              ];
+            }
+          }),
+          _: 1
+        }, _parent2, _scopeId));
+      } else {
+        return [
+          createVNode(_component_Sidebar),
+          createVNode(_component_UDashboardPage, { class: "flex flex-col flex-1 min-w-0 overflow-hidden" }, {
+            default: withCtx(() => [
+              createVNode(_component_Navbar, {
+                title: "Dashboard",
+                icon: "i-lucide-house",
+                class: "w-full"
+              }),
+              createVNode("div", { class: "flex flex-col flex-1 gap-6 p-6 overflow-auto" }, [
+                createVNode("div", { class: "flex items-center justify-between gap-3" }, [
+                  createVNode(_component_UDashboardPageHeader, {
+                    title: "Dashboard",
+                    description: "Welcome to your dashboard."
+                  })
+                ]),
+                createVNode(_component_SupervisorDashboard),
+                createVNode(_component_TicketsTable, {
+                  class: "flex-1 w-full",
+                  forceStatus: "all"
+                })
+              ])
+            ]),
+            _: 1
+          })
+        ];
+      }
+    }),
+    _: 1
+  }, _parent));
+}
+const _sfc_setup = _sfc_main.setup;
+_sfc_main.setup = (props, ctx) => {
+  const ssrContext = useSSRContext();
+  (ssrContext.modules || (ssrContext.modules = /* @__PURE__ */ new Set())).add("pages/supervisor/index.vue");
+  return _sfc_setup ? _sfc_setup(props, ctx) : void 0;
+};
+const index = /* @__PURE__ */ _export_sfc(_sfc_main, [["ssrRender", _sfc_ssrRender]]);
+
+export { index as default };
+//# sourceMappingURL=index-B31zfMgC.mjs.map

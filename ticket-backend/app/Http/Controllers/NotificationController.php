@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Support\Facades\Redis;
 
 class NotificationController extends Controller
 {
@@ -85,62 +86,73 @@ class NotificationController extends Controller
             echo "data: ok\n\n";
             flush();
 
-            while (!connection_aborted()) {
-                try {
-                    $query = $user->unreadNotifications();
+            // Send initial unread notifications once (DB used only for persistence + initial fetch)
+            try {
+                $query = $user->unreadNotifications();
 
-                    if ($lastTime && is_numeric($lastTime)) {
-                        $query->where('created_at', '>', \Carbon\Carbon::createFromTimestamp((int) $lastTime));
-                    }
-
-                    $notifications = $query
-                        ->orderBy('created_at')
-                        ->get();
-
-                    if ($notifications->isNotEmpty()) {
-                        foreach ($notifications as $notification) {
-                            $id = $notification->created_at->timestamp;
-
-                            echo "id: {$id}\n";
-                            echo "event: notification\n";
-                            echo "data: " . json_encode([
-                                'id' => $notification->id,
-                                'type' => $notification->type,
-                                'data' => $notification->data,
-                                'created_at' => $notification->created_at,
-                            ]) . "\n\n";
-
-                            $lastTime = $id;
-                        }
-
-                        flush();
-                    } else {
-                        echo ": heartbeat\n\n";
-                        flush();
-                    }
-                } catch (\Throwable $e) {
-                    echo "event: error\n";
-                    echo "data: " . json_encode(['message' => 'SSE stream error']) . "\n\n";
-                    flush();
-                    break;
+                if ($lastTime && is_numeric($lastTime)) {
+                    $query->where('created_at', '>', \Carbon\Carbon::createFromTimestamp((int) $lastTime));
                 }
 
-                try {
-                    \DB::disconnect();
-                } catch (\Throwable $e) {}
+                $notifications = $query->orderBy('created_at')->get();
 
-                usleep(1000000);
+                if ($notifications->isNotEmpty()) {
+                    foreach ($notifications as $notification) {
+                        $id = $notification->created_at->timestamp;
+
+                        echo "id: {$id}\n";
+                        echo "event: notification\n";
+                        echo "data: " . json_encode([
+                            'id' => $notification->id,
+                            'type' => $notification->type,
+                            'data' => $notification->data,
+                            'created_at' => $notification->created_at,
+                        ]) . "\n\n";
+
+                        $lastTime = $id;
+                    }
+
+                    flush();
+                }
+            } catch (\Throwable $e) {
+                // If initial DB fetch fails, continue to Redis subscription for realtime updates
             }
+
+            // Subscribe to Redis Pub/Sub for realtime notifications
+            $channel = sprintf('notifications:%s', $user->id);
+
+            try {
+                Redis::subscribe([$channel], function ($message) {
+                    if (connection_aborted()) {
+                        // Let the subscribe call end when connection is gone
+                        exit;
+                    }
+
+                    $payload = $message;
+
+                    if (is_array($message) && isset($message['payload'])) {
+                        $payload = $message['payload'];
+                    }
+
+                    echo "event: notification\n";
+                    echo "data: {$payload}\n\n";
+                    flush();
+                });
+            } catch (\Throwable $e) {
+                echo "event: error\n";
+                echo "data: " . json_encode(['message' => 'Redis subscribe failed']) . "\n\n";
+                flush();
+            }
+
         }, 200, [
-            'Content-Type' => 'text/event-stream',
-            'Cache-Control' => 'no-cache',
-            'Connection' => 'keep-alive',
-            'X-Accel-Buffering' => 'no',
-            'Access-Control-Allow-Origin' => 'http://localhost:3000',
-            'Access-Control-Allow-Methods' => 'GET, OPTIONS',
-            'Access-Control-Allow-Headers' => 'Content-Type, Authorization, Last-Event-ID',
-        ]);
+                'Content-Type' => 'text/event-stream',
+                'Cache-Control' => 'no-cache',
+                'Connection' => 'keep-alive',
+                'X-Accel-Buffering' => 'no',
+                'Access-Control-Allow-Origin' => 'http://localhost:3000',
+                'Access-Control-Allow-Methods' => 'GET, OPTIONS',
+                'Access-Control-Allow-Headers' => 'Content-Type, Authorization, Last-Event-ID',
+            ]);
+        }
+
     }
-
-
-}

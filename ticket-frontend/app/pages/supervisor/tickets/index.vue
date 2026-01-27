@@ -7,9 +7,19 @@ const filters = reactive({
   category_id: ''
 })
 
-const { data: categories } = await useAsyncData('categories', () => getCategories(), {
-  default: () => []
-})
+// Fetch categories on client only and lazily to avoid blocking SSR/hydration
+const { data: categories, refresh: refreshCategories } = useAsyncData(
+  'categories',
+  () => getCategories(),
+  {
+    default: () => [],
+    server: false,
+    lazy: true,
+  }
+)
+
+// trigger client-side fetch shortly after mount to avoid blocking initial paint
+if (process.client) setTimeout(() => refreshCategories().catch(() => {}), 300)
 
 const statusOptions = ['open', 'pending', 'closed']
 const priorityOptions = ['low', 'medium', 'high']

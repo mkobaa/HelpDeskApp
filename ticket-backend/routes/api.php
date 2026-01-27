@@ -81,9 +81,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/history/logs', [TicketsController::class, 'getHistoryLogs'])->middleware('admin');
 
-    // SSE notifications are handled without the auth middleware here so the
-    // controller can perform explicit token/session validation and return
-    // proper JSON 401 responses instead of HTML redirects when unauthenticated.
 
     Route::get('/tickets/{ticket}/comments', [CommentsController::class, 'getComments']);
     Route::post('tickets/{ticket}/comments', [CommentsController::class, 'addComment']);
@@ -91,7 +88,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/{ticket}/acceptance', [TicketAcceptanceController::class, 'store'])->middleware('supervisor');
     Route::get('/tickets/{ticket}/acceptance/is-pending', [TicketAcceptanceController::class, 'isPending'])->middleware('supervisor');
 
-    // Technician accepts/rejects an assignment — use POST to avoid accidental route-method mismatches
     Route::post('/tickets/{ticket}/accept', [TicketAcceptanceController::class, 'accept'])->middleware('technician');
     Route::post('/tickets/{ticket}/reject', [TicketAcceptanceController::class, 'reject'])->middleware('technician');
 
@@ -109,6 +105,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/export', [ReportsController::class, 'exportReport'])->middleware('supervisor');
 });
 
-// Place SSE route outside auth middleware so the controller can validate
-// tokens manually and avoid framework auth redirects (which return HTML).
 Route::get('/sse/notifications', [NotificationController::class, 'sseNotifications']);

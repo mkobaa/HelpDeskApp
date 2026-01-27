@@ -64,17 +64,19 @@ re :
 
 ## Production compose targets (use docker-compose.prod.yml)
 compose-prod-up:
-	# Build and run production compose (foreground)
 	docker compose -f docker-compose.prod.yml up --build
 
 compose-prod-up-d:
-	# Build and run production compose (detached)
 	docker compose -f docker-compose.prod.yml up --build -d
 
 compose-prod-down:
-	# Stop and remove production compose services
 	docker compose -f docker-compose.prod.yml down
 
 compose-prod-build:
-	# Build only the production compose images
 	docker compose -f docker-compose.prod.yml build --no-cache
+
+frontend:
+	docker compose -f docker-compose.prod.yml up --build frontend
+
+backend:
+	docker compose -f docker-compose.prod.yml up --build backend
