@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\Attachment;
 
 
 class TicketManagementService
@@ -37,59 +39,74 @@ class TicketManagementService
         return $tickets;
     }
 
-
-    public function createTicket($data , $userId, $attachments)
+    protected function createBaseTicket(array $data, User $user): Ticket
     {
-        $ticket = DB::transaction(function () use ($data, $userId, $attachments) {
+        return Ticket::create([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'priority' => $data['priority'],
+            'assigned_tech_id' => $data['assigned_tech_id'] ?? null,
+            'category_id' => $data['category_id'] ?? null,
+            'submitter_id' => $user->id,
+        ]);
+    }
 
-            // 1. Create ticket
-            $ticket = Ticket::create([
-                'title' => $data['title'],
-                'description' => $data['description'] ?? null,
-                'priority' => $data['priority'],
-                'assigned_tech_id' => $data['assigned_tech_id'] ?? null,
-                'category_id' => $data['category_id'] ?? null,
-                'submitter_id' => $userId,
-            ]);
+    protected function createTimeTracking(Ticket $ticket): void
+    {
+        $ticket->timeTracking()->create([
+            'start_time' => $ticket->created_at,
+        ]);
+    }
 
-            // 2. Create time tracking (ONE clean line)
-            $ticket->timeTracking()->create([
-                'start_time' => $ticket->created_at,
-            ]);
+    protected function handleAttachments(Ticket $ticket, array $attachments, User $user): void
+    {
+        if (empty($attachments)) {
+            return;
+        }
 
-            // 3. Bulk insert attachments
-            if (!empty($attachments)) {
-                $now = now();
-                $rows = [];
+        $now = now();
+        $rows = [];
 
-                foreach ($attachments as $file) {
-                    $path = $file->store('attachments', 'public');
+        foreach ($attachments as $file) {
+            $path = $file->store('attachments', 'public');
 
-                    $rows[] = [
-                        'ticket_id' => $ticket->id,
-                        'file_path' => $path,
-                        'uploaded_by' => $userId,
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                }
+            $rows[] = [
+                'ticket_id' => $ticket->id,
+                'file_path' => $path,
+                'uploaded_by' => $user->id,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ];
+        }
 
-                if ($rows) {
-                    Attachment::insert($rows);
-                }
-            }
+        if ($rows) {
+            Attachment::insert($rows);
+        }
+    }
 
-            // 4. History
-            TicketHistoryService::log(
-                $ticket->id,
-                'ticket_created',
-                $userId,
-                'Ticket created'
-            );
+    protected function logHistory(Ticket $ticket, User $user): void
+    {
+        TicketHistoryService::log(
+            $ticket->id,
+            'ticket_created',
+            $user->id,
+            'Ticket created'
+        );
+    }
+
+    public function createTicket(array $data, User $user, array $attachments)
+    {
+        return DB::transaction(function () use ($data, $user, $attachments) {
+
+            $ticket = $this->createBaseTicket($data, $user);
+
+            $this->createTimeTracking($ticket);
+
+            $this->handleAttachments($ticket, $attachments, $user);
+
+            $this->logHistory($ticket, $user);
 
             return $ticket;
         });
-
-        $ticket->load('attachments');
     }
 }

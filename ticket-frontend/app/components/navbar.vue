@@ -12,73 +12,73 @@ defineProps<{
 
 
 
-type NotificationItem = {
-  id: string | number
-  title: string
-  description: string
-  time: string
-  unread: boolean
-}
+// type NotificationItem = {
+//   id: string | number
+//   title: string
+//   description: string
+//   time: string
+//   unread: boolean
+// }
 
-const notifications = ref<NotificationItem[]>([])
+// const notifications = ref<NotificationItem[]>([])
 const isLoading = ref(false)
 let pollTimer: ReturnType<typeof setInterval> | undefined
 
-const unreadCount = computed(() => notifications.value.filter(n => n.unread).length)
+// const unreadCount = computed(() => notifications.value.filter(n => n.unread).length)
 
-const formatTimeAgo = (isoDate: string) => {
-  const then = new Date(isoDate).getTime()
-  const now = Date.now()
-  const diffSeconds = Math.max(0, Math.floor((now - then) / 1000))
-  if (diffSeconds < 60) return `${diffSeconds}s ago`
-  const diffMinutes = Math.floor(diffSeconds / 60)
-  if (diffMinutes < 60) return `${diffMinutes}m ago`
-  const diffHours = Math.floor(diffMinutes / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
-  const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
-}
+// const formatTimeAgo = (isoDate: string) => {
+//   const then = new Date(isoDate).getTime()
+//   const now = Date.now()
+//   const diffSeconds = Math.max(0, Math.floor((now - then) / 1000))
+//   if (diffSeconds < 60) return `${diffSeconds}s ago`
+//   const diffMinutes = Math.floor(diffSeconds / 60)
+//   if (diffMinutes < 60) return `${diffMinutes}m ago`
+//   const diffHours = Math.floor(diffMinutes / 60)
+//   if (diffHours < 24) return `${diffHours}h ago`
+//   const diffDays = Math.floor(diffHours / 24)
+//   return `${diffDays}d ago`
+// }
 
-const mapApiNotifications = (payload: any): NotificationItem[] => {
-  const items = Array.isArray(payload?.data) ? payload.data : []
-  return items.map((item: any) => ({
-    id: item.id ?? crypto.randomUUID(),
-    title: item.type?.split('\\').pop() || 'Notification',
-    description: item.data?.message || item.data?.message || 'New update',
-    time: item.created_at ? formatTimeAgo(item.created_at) : 'Just now',
-    unread: !item.read_at
-  }))
-}
+// const mapApiNotifications = (payload: any): NotificationItem[] => {
+//   const items = Array.isArray(payload?.data) ? payload.data : []
+//   return items.map((item: any) => ({
+//     id: item.id ?? crypto.randomUUID(),
+//     title: item.type?.split('\\').pop() || 'Notification',
+//     description: item.data?.message || item.data?.message || 'New update',
+//     time: item.created_at ? formatTimeAgo(item.created_at) : 'Just now',
+//     unread: !item.read_at
+//   }))
+// }
 
-const loadNotifications = async () => {
-  try {
-    isLoading.value = true
-    const data = await fetchNotifications()
-    notifications.value = mapApiNotifications(data)
-  } catch (err) {
-    console.error('Failed to load notifications', err)
-  } finally {
-    isLoading.value = false
-  }
-}
+// const loadNotifications = async () => {
+//   try {
+//     isLoading.value = true
+//     const data = await fetchNotifications()
+//     notifications.value = mapApiNotifications(data)
+//   } catch (err) {
+//     console.error('Failed to load notifications', err)
+//   } finally {
+//     isLoading.value = false
+//   }
+// }
 
-const handleNotificationClick = async (notification) => {
-  if (!notification.unread) return
-  try {
-    await markNotificationRead(notification.id)
-    await loadNotifications()
-  } catch (err) {
-    console.error('Failed to mark notification as read', err)
-  }
-}
-const handleMarkAllRead = async () => {
-  try {
-    await markAllNotificationsRead()
-    await loadNotifications()
-  } catch (err) {
-    console.error('Failed to mark all notifications as read', err)
-  }
-}
+// const handleNotificationClick = async (notification) => {
+//   if (!notification.unread) return
+//   try {
+//     await markNotificationRead(notification.id)
+//     await loadNotifications()
+//   } catch (err) {
+//     console.error('Failed to mark notification as read', err)
+//   }
+// }
+// const handleMarkAllRead = async () => {
+//   try {
+//     await markAllNotificationsRead()
+//     await loadNotifications()
+//   } catch (err) {
+//     console.error('Failed to mark all notifications as read', err)
+//   }
+// }
 
 
 
@@ -96,20 +96,20 @@ onMounted(async () => {
     // ignore if not authenticated or request fails
   }
   // load notifications once and start SSE for real-time updates
-  await loadNotifications()
-  startSSE({
-    onMessage(payload) {
-      try {
-        const mapped = mapApiNotifications({ data: [payload] })[0]
-        notifications.value = [mapped, ...notifications.value].slice(0, 50)
-      } catch (e) {
-        // ignore
-      }
-    },
-    onError(err) {
-      console.error('SSE error', err)
-    }
-  })
+  // await loadNotifications()
+  // startSSE({
+  //   onMessage(payload) {
+  //     try {
+  //       const mapped = mapApiNotifications({ data: [payload] })[0]
+  //       notifications.value = [mapped, ...notifications.value].slice(0, 50)
+  //     } catch (e) {
+  //       // ignore
+  //     }
+  //   },
+  //   onError(err) {
+  //     console.error('SSE error', err)
+  //   }
+  // })
 
   if (useCookie('user_role').value === 'technician') {
     loadAssigned()
