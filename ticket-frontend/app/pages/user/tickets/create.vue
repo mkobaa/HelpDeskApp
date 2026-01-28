@@ -85,10 +85,6 @@ const handleDragLeave = (event) => {
 	dragActive.value = false
 }
 const searchCategories = async (q: string) => {
-	if (!q || q.length < 2) {
-		categoryOptions.value = []
-		return
-	}
 	categoryLoading.value = true
 	try {
 		const res = await suggestCategories(q)
@@ -168,105 +164,179 @@ const handleCreate = async () => {
 	<UDashboardGroup>
 		<Sidebar />
 		<UDashboardPage class="flex flex-col flex-1 min-w-0 overflow-hidden">
-			<Navbar title="Create ticket" icon="i-lucide-ticket-plus" class="w-full" />
+			<Navbar title="Create Ticket" icon="i-lucide-ticket-plus" class="w-full" />
 			<div class="flex flex-col flex-1 gap-6 p-6 overflow-auto">
-				<form class="flex flex-col gap-4 max-w-3xl w-full" @submit.prevent="handleCreate">
-					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-						<UFormGroup label="Title" name="title">
-							<UInput v-model="form.title" placeholder="Ticket Title" required maxlength="255" />
-						</UFormGroup>
-						<UFormGroup label="Description" name="description" class="sm:col-span-2">
-							<UTextarea v-model="form.description" placeholder="Ticket Description" rows="6" class="min-h-32 resize-vertical" maxlength="2000" />
-							<p class="text-xs text-muted mt-1">Provide a clear, detailed description (max 2000 characters).</p>
-						</UFormGroup>
-                        <UFormGroup label="Priority" name="priority">
-                            <USelect
-                                v-model="form.priority"
-                                :items="priorityOptions"
-                                placeholder="Select priority"
-                            />
-                            </UFormGroup>
+				<div class="flex items-center justify-between gap-3">
+					<UDashboardPageHeader 
+						title="Create New Ticket" 
+						description="Submit a new support request by filling out the form below." 
+					/>
+					<UButton color="neutral" variant="ghost" icon="i-lucide-arrow-left" to="/user/tickets">
+						Back
+					</UButton>
+				</div>
 
-                            <!-- <UFormGroup label="Status" name="status">
-                            <USelect
-                                v-model="form.status"
-                                :items="statusOptions"
-                                placeholder="Select status"
-                            />
-                            </UFormGroup> -->
+				<form @submit.prevent="handleCreate">
+					<!-- Ticket Details Card -->
+					<UCard class="mb-6">
+						<template #header>
+							<div class="flex items-center gap-2">
+								<span class="i-lucide-file-text text-lg text-primary" />
+								<p class="text-sm font-semibold text-highlighted">Ticket Details</p>
+							</div>
+						</template>
+						<div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+							<UFormGroup label="Title" name="title" required class="sm:col-span-2">
+								<UInput 
+									v-model="form.title" 
+									placeholder="Brief summary of your issue" 
+									required 
+									maxlength="255" 
+									size="lg"
+								/>
+							</UFormGroup>
+							<UFormGroup label="Description" name="description" class="sm:col-span-2">
+								<UTextarea 
+									v-model="form.description" 
+									placeholder="Please describe your issue in detail. Include any relevant information that could help us resolve it faster." 
+									rows="5" 
+									class="resize-y" 
+									maxlength="2000" 
+								/>
+								<template #hint>
+									<span class="text-xs text-muted">{{ form.description?.length || 0 }} / 2000 characters</span>
+								</template>
+							</UFormGroup>
+							<UFormGroup label="Priority" name="priority">
+								<USelect
+									v-model="form.priority"
+									:items="priorityOptions"
+									placeholder="Select priority level"
+									size="lg"
+								/>
+							</UFormGroup>
+							<UFormGroup label="Category" name="category_id">
+								<div class="relative">
+									<UInput
+										:value="categorySearch"
+										placeholder="Type to search categories..."
+										@input="onCategoryInput"
+										@focus="() => { if (!categorySearch) searchCategories('') }"
+										aria-label="Search categories"
+										size="lg"
+									/>
+									<div v-if="categoryLoading" class="absolute right-3 top-1/2 -translate-y-1/2">
+										<span class="i-lucide-loader-2 animate-spin text-muted" />
+									</div>
+									<div v-else-if="selectedCategoryId" class="absolute right-3 top-1/2 -translate-y-1/2">
+										<button type="button" class="text-xs text-muted hover:text-highlighted flex items-center gap-1" @click="clearCategory">
+											<span class="i-lucide-x text-sm" /> Clear
+										</button>
+									</div>
+									<ul v-if="categoryOptions.length" class="absolute z-50 mt-1 w-full bg-elevated border border-default rounded-lg shadow-lg max-h-48 overflow-auto">
+										<li 
+											v-for="opt in categoryOptions" 
+											:key="opt.id || opt.value" 
+											class="px-4 py-2.5 hover:bg-accented cursor-pointer text-sm transition-colors first:rounded-t-lg last:rounded-b-lg" 
+											@click="selectCategory(opt)"
+										>
+											{{ opt.name || opt.title || opt.label || opt.value }}
+										</li>
+									</ul>
+									<div v-else-if="!selectedCategoryId && categorySearch.length >= 2 && !categoryLoading" class="absolute z-50 mt-1 w-full bg-elevated border border-default rounded-lg shadow-lg px-4 py-3 text-sm text-muted">
+										No matching category found
+									</div>
+								</div>
+								<template #hint v-if="selectedCategoryName">
+									<span class="text-xs text-primary flex items-center gap-1">
+										<span class="i-lucide-check text-sm" /> {{ selectedCategoryName }}
+									</span>
+								</template>
+							</UFormGroup>
+						</div>
+					</UCard>
 
-								<UFormGroup label="Category" name="category_id" class="sm:col-span-2">
-										<div class="relative">
-											<UInput
-												:value="categorySearch"
-												placeholder="Search categories by name"
-												@input="onCategoryInput"
-												aria-label="Search categories"
-											/>
-											<div v-if="categoryLoading" class="absolute right-2 top-2 text-xs text-muted">Searching...</div>
-											<ul v-if="categoryOptions.length" class="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-sm max-h-48 overflow-auto">
-												<li v-for="opt in categoryOptions" :key="opt.id || opt.value" class="px-3 py-2 hover:bg-gray-100 cursor-pointer" @click="selectCategory(opt)">
-													{{ opt.name || opt.title || opt.label || opt.value }}
-												</li>
-											</ul>
-											<div v-else-if="categorySearch.length >= 2 && !categoryLoading" class="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-sm px-3 py-2 text-sm text-muted">No matching category</div>
-											<div v-if="selectedCategoryId" class="absolute right-2 top-2">
-												<button type="button" class="text-xs text-muted hover:text-gray-700" @click="clearCategory">Clear</button>
-											</div>
+					<!-- Attachments Card -->
+					<UCard class="mb-6">
+						<template #header>
+							<div class="flex items-center gap-2">
+								<span class="i-lucide-paperclip text-lg text-primary" />
+								<p class="text-sm font-semibold text-highlighted">Attachments</p>
+								<span class="text-xs text-muted">(Optional)</span>
+							</div>
+						</template>
+						<div
+							class="border-2 border-dashed rounded-lg p-8 text-center transition-all cursor-pointer"
+							:class="dragActive ? 'border-primary bg-primary/5 dark:bg-primary/10' : 'border-default bg-muted/30 hover:border-primary/50 hover:bg-muted/50'"
+							@dragover="handleDragOver"
+							@dragleave="handleDragLeave"
+							@drop="handleDrop"
+							@click="$refs.fileInput.click()"
+						>
+							<input
+								ref="fileInput"
+								type="file"
+								multiple
+								class="hidden"
+								@change="handleFileChange"
+							/>
+							<div class="flex flex-col items-center gap-3">
+								<div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+									<span class="i-lucide-upload-cloud text-2xl text-primary" />
+								</div>
+								<div>
+									<span class="font-medium text-highlighted">Drag & drop files here</span>
+									<span class="text-muted"> or </span>
+									<span class="font-medium text-primary cursor-pointer hover:underline">browse</span>
+								</div>
+								<span class="text-xs text-muted">Supports images and PDFs up to 10MB each</span>
+							</div>
+						</div>
+						<div v-if="uploadError" class="mt-3 flex items-center gap-2 text-sm text-error">
+							<span class="i-lucide-alert-circle" />
+							{{ uploadError }}
+						</div>
+						<div v-if="attachments.length" class="mt-4">
+							<p class="text-xs text-muted mb-2">{{ attachments.length }} file{{ attachments.length > 1 ? 's' : '' }} selected</p>
+							<ul class="divide-y divide-default bg-elevated rounded-lg border border-default">
+								<li v-for="(file, idx) in attachments" :key="file.name" class="flex items-start gap-3 px-4 py-3">
+									<!-- Preview thumbnail -->
+									<div class="flex-shrink-0">
+										<div v-if="previews[idx]?.type === 'image'" class="w-16 h-16 rounded-md overflow-hidden border border-default">
+											<img :src="previews[idx].url" :alt="file.name" class="w-full h-full object-cover" />
 										</div>
-										<p class="text-xs text-muted mt-1">Choose a category for the ticket. Selected: <span class="font-medium">{{ selectedCategoryName || (form.category_id ? form.category_id : 'none') }}</span></p>
-								</UFormGroup>
-								<UFormGroup label="Attachments" name="attachments" class="sm:col-span-2">
-									<div
-										class="border-2 border-dashed rounded-md p-6 min-h-28 text-center transition-colors cursor-pointer"
-										:class="dragActive ? 'border-primary bg-primary/10' : 'border-gray-300 bg-gray-50'"
-										@dragover="handleDragOver"
-										@dragleave="handleDragLeave"
-										@drop="handleDrop"
-										@click="$refs.fileInput.click()"
-									>
-										<input
-											ref="fileInput"
-											type="file"
-											multiple
-											class="hidden"
-											@change="handleFileChange"
-										/>
-										<div class="flex flex-col items-center gap-2">
-											<span class="i-lucide-upload-cloud text-3xl text-primary" />
-											<span class="font-medium">Drag & drop files here or <span class="underline text-primary cursor-pointer">browse</span></span>
-											<span class="text-xs text-muted">Max 10MB.</span>
+										<div v-else-if="previews[idx]?.type === 'pdf'" class="w-16 h-16 rounded-md border border-default bg-muted/50 flex items-center justify-center">
+											<span class="i-lucide-file-text text-2xl text-error" />
+										</div>
+										<div v-else class="w-16 h-16 rounded-md border border-default bg-muted/50 flex items-center justify-center">
+											<span class="i-lucide-file text-2xl text-muted" />
 										</div>
 									</div>
-									<div v-if="uploadError" class="mt-2 text-sm text-error">{{ uploadError }}</div>
-									<div class="text-xs text-muted mt-2">You can attach images or PDFs. Max 10MB per file.</div>
-									<div v-if="attachments.length" class="mt-3">
-										<ul class="divide-y divide-gray-200 bg-white rounded-md shadow-sm">
-											<li v-for="(file, idx) in attachments" :key="file.name" class="flex flex-col gap-2 px-3 py-2">
-												<div class="flex items-center gap-2">
-													<span class="i-lucide-file text-lg text-gray-400" />
-													<span class="font-medium">{{ file.name }}</span>
-													<span class="text-xs text-muted">({{ (file.size / 1024 / 1024).toFixed(2) }} MB)</span>
-												</div>
-												<div v-if="previews[idx]?.type === 'image'" class="mt-1 flex items-center">
-													<img :src="previews[idx].url" :alt="file.name" class="max-h-24 rounded border" />
-												</div>
-												<div v-else-if="previews[idx]?.type === 'pdf'" class="mt-1 flex items-center">
-													<embed :src="previews[idx].url" type="application/pdf" class="max-h-32 w-full border rounded" />
-												</div>
-												<div v-else-if="previews[idx]?.type === 'other'" class="mt-1 text-xs text-muted">
-													No preview available
-												</div>
-											</li>
-										</ul>
+									<!-- File info -->
+									<div class="flex-1 min-w-0">
+										<p class="font-medium text-sm text-highlighted truncate">{{ file.name }}</p>
+										<p class="text-xs text-muted mt-0.5">{{ (file.size / 1024 / 1024).toFixed(2) }} MB</p>
 									</div>
-								</UFormGroup>
-					</div>
+								</li>
+							</ul>
+						</div>
+					</UCard>
 
-					
-					<div class="flex justify-end gap-3 pt-2">
-						<UButton color="neutral" variant="ghost" to="/admin/categories">Cancel</UButton>
-						<UButton :loading="isSubmitting" :disabled="isSubmitting" type="submit" color="primary" icon="i-lucide-check">Create</UButton>
+					<!-- Action Buttons -->
+					<div class="flex items-center justify-end gap-3">
+						<UButton color="neutral" variant="ghost" to="/user/tickets" size="lg">
+							Cancel
+						</UButton>
+						<UButton 
+							:loading="isSubmitting" 
+							:disabled="isSubmitting || !form.title" 
+							type="submit" 
+							color="primary" 
+							icon="i-lucide-send"
+							size="lg"
+						>
+							Submit Ticket
+						</UButton>
 					</div>
 				</form>
 			</div>
