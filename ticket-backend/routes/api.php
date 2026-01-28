@@ -34,7 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::get('/users/technicians', [UsersController::class, 'getTechnicians'])->middleware('supervisor');
-    Route::get('/users/technicians/{id}', [UsersController::class, 'getTechnician'])->middleware('supervisor');
+    Route::get('/users/technicians/{user}', [UsersController::class, 'getTechnician'])->middleware('supervisor');
     Route::get('/tickets/my-surveys', [SurveyController::class, 'getMySurveys']);
 
     Route::get('/users', [UsersController::class, 'index'])->middleware('admin');

@@ -19,16 +19,6 @@ class UsersController extends Controller
         ]);
     }
 
-    public function getTechnicians()
-    {
-        $technicians = User::where('role', 'technician')->get();
-
-        return response()->json([
-            'success' => true,
-            'data' => $technicians
-        ]);
-    }
-
     public function store(Request $request)
     {
         $data = $request->validate([
@@ -83,33 +73,6 @@ class UsersController extends Controller
         ]);
     }
 
-    public function destroy(User $user)
-    {
-        $user->delete();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'User deleted successfully.',
-        ]);
-    }
-
-    public function getTechnician($id)
-    {
-        $technician = User::where('role', 'technician')->find($id);
-
-        if (!$technician) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Technician not found.'
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $technician
-        ]);
-    }
-
     public function activate(User $user)
     {
         $user->is_active = true;
@@ -143,4 +106,40 @@ class UsersController extends Controller
             ]
         ]);
     }
+
+    public function destroy(User $user)
+    {
+        $user->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully.',
+        ]);
+    }
+
+    public function getTechnicians()
+    {
+        $technicians = User::where('role', 'technician')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $technicians
+        ]);
+    }
+
+    public function getTechnician(User $user)
+    {
+        if ($user->role !== 'technician') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Technician not found.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
+
 }
