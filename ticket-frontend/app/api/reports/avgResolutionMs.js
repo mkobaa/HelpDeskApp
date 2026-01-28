@@ -12,7 +12,9 @@ export const getAverageResolutionTime = async (criteria = {}) => {
   if (criteria.status) params.append('status', criteria.status)
   if (criteria.technician) params.append('technician', criteria.technician)
 
-  let url = 'http://localhost:8000/api/reports/average-resolution-time'
+  const config = useRuntimeConfig()
+  const API_BASE = config.public?.apiBase || 'http://localhost:8000'
+  let url = `${API_BASE}/api/reports/average-resolution-time`
   const qs = params.toString()
   if (qs) url += `?${qs}`
 

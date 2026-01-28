@@ -39,10 +39,14 @@ declare global {
   const formLoadingInjectionKey: typeof import('../../node_modules/@nuxt/ui/dist/runtime/composables/useFormField').formLoadingInjectionKey
   const formOptionsInjectionKey: typeof import('../../node_modules/@nuxt/ui/dist/runtime/composables/useFormField').formOptionsInjectionKey
   const formStateInjectionKey: typeof import('../../node_modules/@nuxt/ui/dist/runtime/composables/useFormField').formStateInjectionKey
+  const formatStatusLabel: typeof import('../../app/utils/ticket-formatters').formatStatusLabel
+  const formatTicketDate: typeof import('../../app/utils/ticket-formatters').formatTicketDate
   const getAppManifest: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getAppManifest
   const getCurrentInstance: typeof import('../../node_modules/vue').getCurrentInstance
   const getCurrentScope: typeof import('../../node_modules/vue').getCurrentScope
+  const getPriorityClass: typeof import('../../app/utils/ticket-formatters').getPriorityClass
   const getRouteRules: typeof import('../../node_modules/nuxt/dist/app/composables/manifest').getRouteRules
+  const getStatusClass: typeof import('../../app/utils/ticket-formatters').getStatusClass
   const h: typeof import('../../node_modules/vue').h
   const hasInjectionContext: typeof import('../../node_modules/vue').hasInjectionContext
   const inject: typeof import('../../node_modules/vue').inject
@@ -263,10 +267,14 @@ declare module 'vue' {
     readonly formLoadingInjectionKey: UnwrapRef<typeof import('../../node_modules/@nuxt/ui/dist/runtime/composables/useFormField')['formLoadingInjectionKey']>
     readonly formOptionsInjectionKey: UnwrapRef<typeof import('../../node_modules/@nuxt/ui/dist/runtime/composables/useFormField')['formOptionsInjectionKey']>
     readonly formStateInjectionKey: UnwrapRef<typeof import('../../node_modules/@nuxt/ui/dist/runtime/composables/useFormField')['formStateInjectionKey']>
+    readonly formatStatusLabel: UnwrapRef<typeof import('../../app/utils/ticket-formatters')['formatStatusLabel']>
+    readonly formatTicketDate: UnwrapRef<typeof import('../../app/utils/ticket-formatters')['formatTicketDate']>
     readonly getAppManifest: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getAppManifest']>
     readonly getCurrentInstance: UnwrapRef<typeof import('../../node_modules/vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('../../node_modules/vue')['getCurrentScope']>
+    readonly getPriorityClass: UnwrapRef<typeof import('../../app/utils/ticket-formatters')['getPriorityClass']>
     readonly getRouteRules: UnwrapRef<typeof import('../../node_modules/nuxt/dist/app/composables/manifest')['getRouteRules']>
+    readonly getStatusClass: UnwrapRef<typeof import('../../app/utils/ticket-formatters')['getStatusClass']>
     readonly h: UnwrapRef<typeof import('../../node_modules/vue')['h']>
     readonly hasInjectionContext: UnwrapRef<typeof import('../../node_modules/vue')['hasInjectionContext']>
     readonly inject: UnwrapRef<typeof import('../../node_modules/vue')['inject']>

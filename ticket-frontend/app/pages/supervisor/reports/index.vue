@@ -5,6 +5,7 @@ import { getAverageResolutionTime } from '~/api/reports/avgResolutionMs'
 import { getTicketsResolved } from '~/api/reports/ticketsResolved'
 import { getTicketsResolvedOverTime } from '~/api/reports/ticketsResolvedOverTime'
 import { getSolutionTimeTrends } from '~/api/reports/solutionTimeTrends'
+import { getCustomerSatisfaction } from '~/api/reports/customerSatisfaction'
 
 const range = ref('7')
 const customFrom = ref('')
@@ -21,6 +22,7 @@ const resolvedLabels = ref<string[]>([])
 const resolvedValues = ref<number[]>([])
 const solutionLabels = ref<string[]>([])
 const solutionValues = ref<number[]>([])
+const avgSatisfactionApi = ref<number | null>(null)
 
 const technicians = ref([])
 
@@ -87,6 +89,15 @@ const fetchTickets = async () => {
       else avgResolutionMinutes.value = null
     } catch (e) {
       avgResolutionMinutes.value = null
+    }
+    // fetch customer satisfaction average from API
+    try {
+      const csCriteria = buildCriteria()
+      const cs = await getCustomerSatisfaction(csCriteria)
+      if (cs && typeof cs.average_satisfaction_rating !== 'undefined') avgSatisfactionApi.value = Number(cs.average_satisfaction_rating)
+      else avgSatisfactionApi.value = null
+    } catch (e) {
+      avgSatisfactionApi.value = null
     }
     // fetch resolved count from API
     try {
@@ -187,32 +198,76 @@ const formatDate = (val) => {
   return d.toLocaleString()
 }
 
-const downloadCSV = () => {
-  const rows = [['Ticket ID','Subject','Status','Technician','Created At','Closed At','Resolution Time','Satisfaction']]
-  tickets.value.forEach(t => {
-    const created = formatDate(t.created_at)
-    const closed = formatDate(t.closed_at)
-    const resTime = t.created_at && t.closed_at ? (() => {
-      const ms = new Date(t.closed_at).getTime() - new Date(t.created_at).getTime()
-      const mins = Math.floor(ms/60000); return `${Math.floor(mins/60)}h ${mins%60}m`
-    })() : ''
-    rows.push([t.id, (t.title||t.subject||''), t.status||'', (t.technician_name||t.technician||''), created, closed, resTime, t.satisfaction||''])
-  })
-  const csv = rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n')
-  const blob = new Blob([csv], { type: 'text/csv' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url; a.download = 'reports.csv'; a.click(); URL.revokeObjectURL(url)
+const downloadCSV = async () => {
+  // Call backend export endpoint so server generates CSV with same filters
+  try {
+    const token = useCookie('auth_token')
+    let bearer = token.value || ''
+    try { bearer = decodeURIComponent(bearer) } catch {}
+
+    const qs = buildParams()
+    const config = useRuntimeConfig()
+    const API_BASE = config.public?.apiBase || 'http://localhost:8000'
+    let url = `${API_BASE}/api/reports/export`
+    if (qs) url += `?${qs}`
+
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'text/csv',
+        Authorization: `Bearer ${bearer}`,
+      }
+    })
+
+    if (!res.ok) {
+      const txt = await res.text()
+      console.error('Export CSV failed', res.status, txt)
+      return
+    }
+
+    const blob = await res.blob()
+    const dlUrl = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = dlUrl
+    a.download = `reports_${new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}.csv`
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+    URL.revokeObjectURL(dlUrl)
+  } catch (err) {
+    console.error('downloadCSV error', err)
+  }
 }
 
 const exportPDF = () => {
-  const wnd = window.open('', '_blank')
-  if (!wnd) return
-  const rows = tickets.value.map(t => `<tr><td>${t.id}</td><td>${(t.title||t.subject||'')}</td><td>${t.status||''}</td><td>${t.technician_name||t.technician||''}</td><td>${formatDate(t.created_at)}</td><td>${formatDate(t.closed_at)}</td><td>${t.satisfaction||''}</td></tr>`).join('')
-  wnd.document.write(`<html><head><title>Reports</title><style>table{width:100%;border-collapse:collapse}td,th{border:1px solid #ddd;padding:8px;text-align:left}</style></head><body><h2>Reports</h2><table><thead><tr><th>ID</th><th>Subject</th><th>Status</th><th>Technician</th><th>Created</th><th>Closed</th><th>Satisfaction</th></tr></thead><tbody>${rows}</tbody></table></body></html>`)
-  wnd.document.close()
-  wnd.focus()
-  wnd.print()
+  ;(async () => {
+    try {
+      const token = useCookie('auth_token')
+      let bearer = token.value || ''
+      try { bearer = decodeURIComponent(bearer) } catch {}
+
+      const qs = buildParams()
+      const config = useRuntimeConfig()
+      const API_BASE = config.public?.apiBase || 'http://localhost:8000'
+      let url = `${API_BASE}/api/reports/export-pdf`
+      if (qs) url += `?${qs}`
+
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${bearer}` } })
+      if (!res.ok) {
+        const txt = await res.text()
+        console.error('Export PDF failed', res.status, txt)
+        return
+      }
+
+      const contentType = res.headers.get('content-type') || ''
+      const blob = await res.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      window.open(blobUrl, '_blank')
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+    } catch (err) {
+      console.error('exportPDF error', err)
+    }
+  })()
 }
 </script>
 
@@ -229,7 +284,7 @@ const exportPDF = () => {
 
         <reportsFilterBar :initial="{ range: range, from: customFrom, to: customTo, status: status, technician: technician, priority: priority }" :technicians="technicians" @apply="(f)=>{ range.value=f.range; customFrom.value=f.from; customTo.value=f.to; status.value=f.status; technician.value=f.technician; priority.value=f.priority; applyFilters() }" />
 
-        <reportsKPICards :tickets="tickets" :avg-resolution-minutes="avgResolutionMinutes" :resolved-count-override="resolvedCountApi" />
+        <reportsKPICards :tickets="tickets" :avg-resolution-minutes="avgResolutionMinutes" :resolved-count-override="resolvedCountApi" :avg-satisfaction-override="avgSatisfactionApi" />
 
         <reportsCharts :labels="resolvedLabels" :data="resolvedValues" :secondary-data="solutionValues" :secondary-label="'Avg solution time (min)'" />
       </div>

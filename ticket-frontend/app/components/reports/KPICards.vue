@@ -3,7 +3,8 @@ import { computed } from 'vue'
 const props = defineProps({
   tickets: { type: Array, default: () => [] },
   avgResolutionMinutes: { type: Number, required: false },
-  resolvedCountOverride: { type: Number, required: false }
+  resolvedCountOverride: { type: Number, required: false },
+  avgSatisfactionOverride: { type: Number, required: false }
 })
 
 const resolvedCount = computed(() => {
@@ -34,6 +35,7 @@ const avgResolutionDisplay = computed(() => {
 })
 
 const avgSatisfaction = computed(() => {
+  if (typeof props.avgSatisfactionOverride === 'number') return props.avgSatisfactionOverride
   const vals = props.tickets.map(t => Number(t.satisfaction)).filter(n => !Number.isNaN(n))
   if (!vals.length) return '-' 
   const avg = vals.reduce((a,b)=>a+b,0)/vals.length

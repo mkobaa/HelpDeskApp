@@ -7,7 +7,9 @@ export const getSolutionTimeTrends = async (criteria = {}) => {
   if (criteria.from) params.append('from', criteria.from)
   if (criteria.to) params.append('to', criteria.to)
 
-  let url = 'http://localhost:8000/api/reports/solution-time-trends'
+  const config = useRuntimeConfig()
+  const API_BASE = config.public?.apiBase || 'http://localhost:8000'
+  let url = `${API_BASE}/api/reports/solution-time-trends`
   const qs = params.toString()
   if (qs) url += `?${qs}`
 

@@ -31,6 +31,7 @@ export { setInterval } from '#app/compat/interval';
 export { definePageMeta } from '../node_modules/nuxt/dist/pages/runtime/composables';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 export { default as notifications, fetchNotifications, markNotificationRead, markAllNotificationsRead, startSSE, stopSSE } from '../app/utils/notifications';
+export { getPriorityClass, getStatusClass, formatStatusLabel, formatTicketDate } from '../app/utils/ticket-formatters';
 export { defineLocale, extendLocale } from '../node_modules/@nuxt/ui/dist/runtime/composables/defineLocale';
 export { extractShortcuts, defineShortcuts } from '../node_modules/@nuxt/ui/dist/runtime/composables/defineShortcuts';
 export { useFileUpload } from '../node_modules/@nuxt/ui/dist/runtime/composables/useFileUpload';

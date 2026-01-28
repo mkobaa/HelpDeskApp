@@ -9,7 +9,9 @@ export const getTicketsResolved = async (criteria = {}) => {
   if (criteria.technician_id || criteria.technician) params.append('technician_id', criteria.technician_id ?? criteria.technician)
   if (criteria.priority) params.append('priority', criteria.priority)
 
-  let url = 'http://localhost:8000/api/reports/tickets-resolved'
+  const config = useRuntimeConfig()
+  const API_BASE = config.public?.apiBase || 'http://localhost:8000'
+  let url = `${API_BASE}/api/reports/tickets-resolved`
   const qs = params.toString()
   if (qs) url += `?${qs}`
 

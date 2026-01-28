@@ -103,6 +103,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/tickets-resolved-overtime', [ReportsController::class, 'ticketsResolvedOverTime'])->middleware('supervisor');
     Route::get('/reports/solution-time-trends', [ReportsController::class, 'solutionTimeTrends'])->middleware('supervisor');
     Route::get('/reports/export', [ReportsController::class, 'exportReport'])->middleware('supervisor');
+    Route::get('/reports/export-pdf', [ReportsController::class, 'exportPdf'])->middleware('supervisor');
 });
 
 // Route::get('/sse/notifications', [NotificationController::class, 'sseNotifications']);

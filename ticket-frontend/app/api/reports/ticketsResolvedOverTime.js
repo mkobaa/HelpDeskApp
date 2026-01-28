@@ -8,7 +8,9 @@ export const getTicketsResolvedOverTime = async (criteria = {}) => {
   if (criteria.to) params.append('to', criteria.to)
   if (criteria.technician_id || criteria.technician) params.append('technician_id', criteria.technician_id ?? criteria.technician)
 
-  let url = 'http://localhost:8000/api/reports/tickets-resolved-overtime'
+  const config = useRuntimeConfig()
+  const API_BASE = config.public?.apiBase || 'http://localhost:8000'
+  let url = `${API_BASE}/api/reports/tickets-resolved-overtime`
   const qs = params.toString()
   if (qs) url += `?${qs}`
 
