@@ -32,14 +32,11 @@ class CategoriesController extends Controller
         ])->setStatusCode(201);
     }
 
-    public function show($id)
+    public function show(Category $category)
     {
-        $category = Category::find($id);
-
-        if (!$category) {
-            return response()->json(['message' => 'Category not found'], 404);
-        }
-        return response()->json($category->load('parent'));
+        return response()->json(
+            $category->load('parent')
+        );
     }
 
     public function update(Request $request, Category $category)
@@ -64,6 +61,20 @@ class CategoriesController extends Controller
 
         if (!$category) {
             return response()->json(['message' => 'Category not found'], 404);
+        }
+
+        if ($category->children()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete category with subcategories. Please reassign or delete subcategories first.',
+            ], 400);
+        }
+
+        if ($category->tickets()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete category assigned to tickets. Please reassign or delete tickets first.',
+            ], 400);
         }
 
         $category->delete();
