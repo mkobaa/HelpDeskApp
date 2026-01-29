@@ -6,6 +6,7 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/login')
   }
 
+
   const redirects = {
     admin: '/admin',
     supervisor: '/supervisor',
@@ -17,11 +18,16 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo(redirects[userRole.value] || '/')
   }
 
+  if (to.path === '/') {
+    if (authToken.value)
+      return navigateTo(redirects[userRole.value] || '/')
+    return navigateTo('/login')
+  }
+
   if (authToken.value) {
     const expectedBase = redirects[userRole.value] || null
     if (expectedBase && to.path !== '/' && !to.path.startsWith(expectedBase)) {
-      // Allow certain public-ish routes that are not dashboard-specific
-      const allowedPrefixes = ['/api', '/_', '/logout', '/login']
+      const allowedPrefixes = ['/profile', '/logout', '/login']
       const isAllowed = allowedPrefixes.some(p => to.path.startsWith(p))
       if (!isAllowed) return navigateTo(expectedBase)
     }

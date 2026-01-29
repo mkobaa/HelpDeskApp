@@ -27,7 +27,8 @@ class TicketsController extends Controller
 
     public function show(Ticket $ticket)
     {
-        $ticket->load(['attachments', 'technician:id,username']);
+        // include attachments, technician and category (name) so frontend can display category name
+        $ticket->load(['attachments', 'technician:id,username', 'category:id,name']);
         return response()->json([
             'success' => true,
             'data' => $ticket

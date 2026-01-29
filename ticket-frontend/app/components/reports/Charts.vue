@@ -53,7 +53,7 @@ const chartDataSecondary = computed(() => ({
   labels: props.labels || [],
   datasets: [
     {
-      label: props.secondaryLabel || 'Average solution time (minutes)',
+      label: props.secondaryLabel || 'Average solution time (hours)',
       data: Array.isArray(props.secondaryData) ? props.secondaryData.map(v => Number(v) || 0) : [],
       tension: 0.3,
       borderColor: '#10b981',

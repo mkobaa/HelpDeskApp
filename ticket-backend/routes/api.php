@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users/technicians', [UsersController::class, 'getTechnicians'])->middleware('supervisor');
     Route::get('/users/technicians/{user}', [UsersController::class, 'getTechnician'])->middleware('supervisor');
     Route::get('/tickets/my-surveys', [SurveyController::class, 'getMySurveys']);
+    Route::get('/tickets/survey', [SurveyController::class, 'getSurveys']);
+
 
     Route::get('/users', [UsersController::class, 'index'])->middleware('admin');
     Route::get('/users/{user}', [UsersController::class, 'show'])->middleware('admin');
@@ -92,7 +94,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/tickets/{ticket}/reject', [TicketAcceptanceController::class, 'reject'])->middleware('technician');
 
     Route::post('/tickets/{ticket}/survey', [SurveyController::class, 'submitSurvey']);
-    Route::get('/tickets/survey', [SurveyController::class, 'getSurveys'])->middleware('supervisor');
     Route::get('/tickets/{ticket}/survey', [SurveyController::class, 'getSurveyByTicket'])->middleware('supervisor');
 
 

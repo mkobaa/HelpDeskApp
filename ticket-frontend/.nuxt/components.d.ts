@@ -17,6 +17,7 @@ type LazyComponent<T> = DefineComponent<HydrationStrategies, {}, {}, {}, {}, {},
 export const CategoriesTable: typeof import("../app/components/CategoriesTable.vue").default
 export const Sidebar: typeof import("../app/components/Sidebar.vue").default
 export const SupervisorDashboard: typeof import("../app/components/SupervisorDashboard.vue").default
+export const SurveysTable: typeof import("../app/components/SurveysTable.vue").default
 export const TechnicianTickets: typeof import("../app/components/TechnicianTickets.vue").default
 export const TicketComments: typeof import("../app/components/TicketComments.vue").default
 export const UsersTable: typeof import("../app/components/UsersTable.vue").default
@@ -185,6 +186,7 @@ export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components
 export const LazyCategoriesTable: LazyComponent<typeof import("../app/components/CategoriesTable.vue").default>
 export const LazySidebar: LazyComponent<typeof import("../app/components/Sidebar.vue").default>
 export const LazySupervisorDashboard: LazyComponent<typeof import("../app/components/SupervisorDashboard.vue").default>
+export const LazySurveysTable: LazyComponent<typeof import("../app/components/SurveysTable.vue").default>
 export const LazyTechnicianTickets: LazyComponent<typeof import("../app/components/TechnicianTickets.vue").default>
 export const LazyTicketComments: LazyComponent<typeof import("../app/components/TicketComments.vue").default>
 export const LazyUsersTable: LazyComponent<typeof import("../app/components/UsersTable.vue").default>

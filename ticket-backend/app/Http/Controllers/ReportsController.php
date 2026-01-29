@@ -24,10 +24,13 @@ class ReportsController extends Controller
         $averageTime = $query->join('time_tracking', 'tickets.id', '=', 'time_tracking.ticket_id')
             ->avg('time_tracking.total_time_minutes');
 
+        $averageHours = is_null($averageTime) ? null : ($averageTime / 60);
+
         return response()->json([
             'success' => true,
             'data' => [
-                'average_resolution_time_minutes' => round($averageTime, 2),
+                'average_resolution_time_minutes' => is_null($averageTime) ? null : round($averageTime, 2),
+                'average_resolution_time_hours' => is_null($averageHours) ? null : round($averageHours, 2),
                 'period' => [
                     'from' => $from,
                     'to' => $to,
@@ -157,8 +160,9 @@ class ReportsController extends Controller
             ->orderBy('date', 'asc')
             ->get();
 
-        $labels = $rows->pluck('date')->map(fn($d) => $d->format('Y-m-d'));
-        $values = $rows->pluck('avg_time')->map(fn($v) => round($v, 2));
+        $labels = $rows->pluck('date')->map(fn($d) => (string) $d);
+        // convert minutes to hours for the trend values
+        $values = $rows->pluck('avg_time')->map(fn($v) => is_null($v) ? null : round($v / 60, 2));
 
         return response()->json([
             'success' => true,
@@ -168,7 +172,6 @@ class ReportsController extends Controller
     }
 
 
-    // public function exportReport(Request $request)
     public function exportReport(Request $request)
     {
         // Build base query joining time_tracking, technician and survey (survey is unique per ticket)
@@ -188,7 +191,6 @@ class ReportsController extends Controller
                 'surveys.satisfaction_rating as satisfaction'
             ]);
 
-        // Filters (keep same semantics as other report endpoints)
         if ($request->query('from') && $request->query('to')) {
             $query->whereBetween('tickets.created_at', [$request->query('from'), $request->query('to')]);
         }
@@ -215,7 +217,6 @@ class ReportsController extends Controller
             fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, ['Ticket ID', 'Title', 'Status', 'Priority', 'Technician', 'Created At', 'Closed At', 'Resolution Minutes', 'Satisfaction']);
 
-            // Use cursor to stream rows
             foreach ($query->orderBy('tickets.created_at', 'desc')->cursor() as $row) {
                 $created = $row->created_at ? (string)$row->created_at : '';
                 $closed = $row->closed_at ? (string)$row->closed_at : '';
@@ -298,7 +299,7 @@ class ReportsController extends Controller
         }
         $html .= '</tbody></table></body></html>';
 
-        // If Dompdf is available, render PDF; otherwise return HTML for client to print
+        // If Dompdf is available, render PDF
         if (class_exists(\Dompdf\Dompdf::class)) {
             $dompdf = new \Dompdf\Dompdf();
             $dompdf->loadHtml($html);
@@ -312,6 +313,49 @@ class ReportsController extends Controller
             ]);
         }
 
+        // Try wkhtmltopdf CLI as a fallback if installed on the server
+        $wkPath = null;
+        try {
+            $whichOutput = [];
+            $whichReturn = 1;
+            @exec('which wkhtmltopdf', $whichOutput, $whichReturn);
+            if ($whichReturn === 0 && !empty($whichOutput[0])) {
+                $wkPath = trim($whichOutput[0]);
+            }
+        } catch (\Throwable $e) {
+            $wkPath = null;
+        }
+
+        if ($wkPath) {
+            $tmpHtml = tempnam(sys_get_temp_dir(), 'rpthtml_') . '.html';
+            $tmpPdf = tempnam(sys_get_temp_dir(), 'rptpdf_') . '.pdf';
+            try {
+                file_put_contents($tmpHtml, $html);
+                // --enable-local-file-access may be required for some wkhtmltopdf builds
+                $cmd = escapeshellarg($wkPath) . ' ' . escapeshellarg($tmpHtml) . ' ' . escapeshellarg($tmpPdf) . ' --enable-local-file-access';
+                $output = [];
+                $returnVar = 1;
+                @exec($cmd . ' 2>&1', $output, $returnVar);
+                if ($returnVar === 0 && file_exists($tmpPdf)) {
+                    $pdf = file_get_contents($tmpPdf);
+                    $fileName = 'reports_export_' . date('Ymd_His') . '.pdf';
+                    // cleanup
+                    @unlink($tmpHtml);
+                    @unlink($tmpPdf);
+                    return response($pdf, 200, [
+                        'Content-Type' => 'application/pdf',
+                        'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+                    ]);
+                }
+            } catch (\Throwable $e) {
+                // ignore and fallthrough to HTML
+            } finally {
+                @unlink($tmpHtml);
+                @unlink($tmpPdf);
+            }
+        }
+
+        // Fallback: return HTML for client to print
         return response($html, 200, [
             'Content-Type' => 'text/html; charset=utf-8',
             'Content-Disposition' => 'inline; filename="reports_export.html"',

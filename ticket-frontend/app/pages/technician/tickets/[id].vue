@@ -66,55 +66,13 @@ const assignedTechnician = computed(() => {
   return (users.value || []).find(u => u.id == techId)
 })
 
+const router = useRouter()
 
-
-const elapsedTime = ref('')
-let timerInterval: NodeJS.Timeout | null = null
-
-const updateTimer = () => {
-  if (!ticket.value?.created_at) return
-  
-  const created = new Date(ticket.value.created_at).getTime()
-  const now = new Date().getTime()
-  const diff = now - created
-  
-  if (diff < 0) {
-    elapsedTime.value = '0s'
-    return
-  }
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-
-  const parts = []
-  if (days > 0) parts.push(`${days}d`)
-  if (hours > 0) parts.push(`${hours}h`)
-  if (minutes > 0) parts.push(`${minutes}m`)
-  parts.push(`${seconds}s`)
-  
-  elapsedTime.value = parts.join(' ')
+const goToCategory = (catId) => {
+  if (!catId) return
+  router.push({ path: '/technician/tickets', query: { category_id: String(catId) } })
 }
 
-onMounted(() => {
-  updateTimer()
-  timerInterval = setInterval(updateTimer, 1000)
-})
-
-onUnmounted(() => {
-  if (timerInterval) clearInterval(timerInterval)
-})
-
-watchEffect(() => {
-  if (ticket.value) {
-
-    form.status = ticket.value.status || ''
-    form.priority = ticket.value.priority || ''
-    const techId = ticket.value.assigned_tech_id || ticket.value.technician_id || ticket.value.technicianId || ticket.value.technician?.id
-    form.technicianId = techId ? String(techId) : ''
-  }
-})
 
 const toggleEdit = () => {
   isEditing.value = !isEditing.value
@@ -191,10 +149,6 @@ onNuxtReady(() => {
               <UBadge color="primary" variant="soft">{{ ticket?.status || '-' }}</UBadge>
             </div>
             <div class="space-y-1">
-              <p class="text-xs text-muted-500">Time Elapsed</p>
-              <p class="text-base text-gray-900 font-mono">{{ elapsedTime }}</p>
-            </div>
-            <div class="space-y-1">
               <p class="text-xs text-muted-500">Priority</p>
               <p class="text-base text-gray-900">{{ ticket?.priority || '-' }}</p>
             </div>
@@ -206,7 +160,12 @@ onNuxtReady(() => {
             </div>
             <div class="space-y-1">
               <p class="text-xs text-muted-500">Category</p>
-              <p class="text-base text-gray-900">{{ ticket?.category?.name || '-' }}</p>
+              <p class="text-base text-gray-900">
+                <button v-if="ticket?.category?.id" @click.prevent="goToCategory(ticket.category.id)" class="text-gray-900 hover:underline">
+                  {{ ticket?.category?.name || '-' }}
+                </button>
+                <span v-else>{{ ticket?.category?.name || '-' }}</span>
+              </p>
             </div>
             <div class="space-y-1 sm:col-span-2">
               <p class="text-xs text-muted-500">Description</p>

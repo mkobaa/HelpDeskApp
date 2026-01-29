@@ -10,9 +10,13 @@ while ! bash -c "cat < /dev/tcp/${host}/${port}" >/dev/null 2>&1; do
 done
 echo "Database is reachable"
 
+# Ensure we don't overwrite an existing .env (preserve user-provided settings)
+if [ ! -f .env ]; then
+  cp .env.example .env
+fi
+
 # Run migrations and seed demo data (safe to run multiple times)
 # Allow migrate to fail or return non-zero without stopping the script
-cp .env.example .env
 php artisan migrate --force || echo "php artisan migrate failed or had nothing to run; continuing"
 php artisan db:seed --class=DemoTicketSeeder || true
 

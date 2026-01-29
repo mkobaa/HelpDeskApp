@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { createCategory } from '~/api/categories/createCategory'
+import { getCategories } from '~/api/categories/categories'
 import { useRouter } from '#imports'
 
 
@@ -8,6 +9,23 @@ const form = reactive({
 	name: '',
 	description: '',
 	parentId: null
+})
+
+// async provider for parent category select
+const categoriesList = ref([])
+
+const loadCategories = async () => {
+	try {
+		const cats = await getCategories('')
+		const arr = Array.isArray(cats) ? cats : (Array.isArray(cats?.data) ? cats.data : [])
+		categoriesList.value = arr.map(cat => ({ label: cat.name, value: cat.id }))
+	} catch (e) {
+		categoriesList.value = []
+	}
+}
+
+onMounted(() => {
+	loadCategories()
 })
 
 const isSubmitting = ref(false)
@@ -46,8 +64,18 @@ const handleCreate = async () => {
 							<UInput v-model="form.description" placeholder="Category Description" maxlength="255" />
 						</UFormGroup>
 					</div>
-
 					
+					<div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+						<UFormGroup label="Parent Category" name="parent_category_id">
+							<USelect
+								v-model="form.parentId"
+								:items="[{ label: 'None', value: null }, ...categoriesList]"
+								placeholder="Select parent category"
+								searchable
+								clearable
+							/>
+						</UFormGroup>
+					</div>
 					<div class="flex justify-end gap-3 pt-2">
 						<UButton color="neutral" variant="ghost" to="/admin/categories">Cancel</UButton>
 						<UButton :loading="isSubmitting" :disabled="isSubmitting" type="submit" color="primary" icon="i-lucide-check">Create</UButton>

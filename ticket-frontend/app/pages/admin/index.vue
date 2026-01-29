@@ -79,7 +79,6 @@ const applyFilters = async (f) => {
           <UDashboardPageHeader title="Admin Dashboard" description="Overview of users, categories and history." />
         </div>
 
-        <reportsFilterBar :initial="{ range: range, from: customFrom, to: customTo, status: status, priority: priority }" @apply="applyFilters" />
 
         <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <UCard class="h-full">

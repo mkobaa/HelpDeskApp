@@ -84,9 +84,18 @@ const fetchTickets = async () => {
     try {
       const criteria = buildCriteria()
       const avg = await getAverageResolutionTime(criteria)
-      // helper returns raw.data or raw; normalize to minutes
-      if (avg && typeof avg.average_resolution_time_minutes !== 'undefined') avgResolutionMinutes.value = Number(avg.average_resolution_time_minutes)
-      else avgResolutionMinutes.value = null
+      // helper returns raw.data or raw; API now includes hours. Keep KPI prop in minutes for backward compatibility.
+      if (avg) {
+        if (typeof avg.average_resolution_time_hours !== 'undefined' && avg.average_resolution_time_hours !== null) {
+          avgResolutionMinutes.value = Number(avg.average_resolution_time_hours) * 60
+        } else if (typeof avg.average_resolution_time_minutes !== 'undefined' && avg.average_resolution_time_minutes !== null) {
+          avgResolutionMinutes.value = Number(avg.average_resolution_time_minutes)
+        } else {
+          avgResolutionMinutes.value = null
+        }
+      } else {
+        avgResolutionMinutes.value = null
+      }
     } catch (e) {
       avgResolutionMinutes.value = null
     }
@@ -286,7 +295,7 @@ const exportPDF = () => {
 
         <reportsKPICards :tickets="tickets" :avg-resolution-minutes="avgResolutionMinutes" :resolved-count-override="resolvedCountApi" :avg-satisfaction-override="avgSatisfactionApi" />
 
-        <reportsCharts :labels="resolvedLabels" :data="resolvedValues" :secondary-data="solutionValues" :secondary-label="'Avg solution time (min)'" />
+        <reportsCharts :labels="resolvedLabels" :data="resolvedValues" :secondary-data="solutionValues" :secondary-label="'Avg solution time (hours)'" />
       </div>
     </UDashboardPage>
   </UDashboardGroup>

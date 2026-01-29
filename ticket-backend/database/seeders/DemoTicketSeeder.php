@@ -10,11 +10,14 @@ use App\Models\Category;
 use App\Models\TimeTracking;
 use App\Models\Survey;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class DemoTicketSeeder extends Seeder
 {
     public function run(): void
     {
+        DB::statement("SELECT setval(pg_get_serial_sequence('categories','id'), (SELECT COALESCE(MAX(id),1) FROM categories));");
+
         $categories = [
             ['id' => 1, 'name' => 'General', 'description' => 'General inquiries'],
             ['id' => 2, 'name' => 'Technical', 'description' => 'Technical issues'],
@@ -61,15 +64,15 @@ class DemoTicketSeeder extends Seeder
 
         // Generate a larger set of demo tickets across the last 30 days
         // Requirements: all tickets closed; resolution between 0 and 8 hours; surveys filled by submitters
-        $total = 1000;
+        $total = 500;
         for ($i = 1; $i <= $total; $i++) {
             $submitterId = $userIdsByRole['user'][array_rand($userIdsByRole['user'])];
 
             // Created_at random within last 30 days
             $createdAt = Carbon::now()->subDays(rand(0, 29))->subHours(rand(0, 23))->subMinutes(rand(0, 59))->subSeconds(rand(0,59));
 
-            // Make every ticket closed
-            $status = 'closed';
+            $statusOptions = ['closed', 'resolved', 'in_progress', 'pending', 'open'];
+            $status = $statusOptions[array_rand($statusOptions)];
 
             // Assign a random technician (if available)
             $assignedTech = null;

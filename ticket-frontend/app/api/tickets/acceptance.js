@@ -14,7 +14,8 @@ export const isPending = async (ticketId) => {
   })
   const raw = await res.json()
   if (!res.ok) throw raw
-  return raw
+  // API returns { success: true, data: { is_pending, status, technician_name, technician_id } }
+  return raw?.data ?? raw
 }
 
 export const accept = async (ticketId) => {

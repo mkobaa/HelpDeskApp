@@ -76,6 +76,13 @@ const assignedTechnician = computed(() => {
   return (users.value || []).find(u => u.id == techId)
 })
 
+const router = useRouter()
+
+const goToCategory = (catId) => {
+  if (!catId) return
+  router.push({ path: '/supervisor/tickets', query: { category_id: String(catId) } })
+}
+
 const acceptancePending = ref(false)
 const acceptanceTechName = ref(null)
 const acceptanceTechId = ref(null)
@@ -98,9 +105,11 @@ const loadAcceptance = async () => {
   try {
     acceptanceLoading.value = true
     const res = await fetchIsPending(ticketId.value)
-    acceptancePending.value = !!res?.is_pending
-    acceptanceTechName.value = res?.technician_name ?? null
-    acceptanceTechId.value = res?.technician_id ?? null
+    const payload = res?.data ?? res ?? {}
+    acceptancePending.value = !!payload.is_pending
+    acceptanceTechName.value = payload.technician_name ?? null
+    acceptanceTechId.value = payload.technician_id ?? null
+
   } catch (err) {
     console.error('Failed to load acceptance pending state', err)
     acceptancePending.value = false
@@ -151,45 +160,6 @@ const performAssign = async () => {
   }
 }
 
-// Comments are handled by TicketComments component
-
-const elapsedTime = ref('')
-let timerInterval: NodeJS.Timeout | null = null
-
-const updateTimer = () => {
-  if (!ticket.value?.created_at) return
-  
-  const created = new Date(ticket.value.created_at).getTime()
-  const now = new Date().getTime()
-  const diff = now - created
-  
-  if (diff < 0) {
-    elapsedTime.value = '0s'
-    return
-  }
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-  const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-
-  const parts = []
-  if (days > 0) parts.push(`${days}d`)
-  if (hours > 0) parts.push(`${hours}h`)
-  if (minutes > 0) parts.push(`${minutes}m`)
-  parts.push(`${seconds}s`)
-  
-  elapsedTime.value = parts.join(' ')
-}
-
-onMounted(() => {
-  updateTimer()
-  timerInterval = setInterval(updateTimer, 1000)
-})
-
-onUnmounted(() => {
-  if (timerInterval) clearInterval(timerInterval)
-})
 
 watchEffect(() => {
   if (ticket.value) {
@@ -235,12 +205,10 @@ const handleSave = async () => {
 
 onNuxtReady(() => {
   refresh()
-  loadComments()
   loadAcceptance()
 })
 
 watch(ticket, (t) => {
-  if (t) loadComments()
   if (t) loadAcceptance()
 })
 </script>
@@ -248,7 +216,7 @@ watch(ticket, (t) => {
 <template>
   <UDashboardGroup>
     <Sidebar />
-    <UDashboardPage class="flex flex-col h-screen min-w-0">
+    <UDashboardPage class="flex flex-col flex-1 min-w-0 overflow-hidden">
       <Navbar title="Ticket" icon="i-lucide-ticket" class="w-full" />
       <div class="flex flex-col flex-1 min-h-0 gap-6 p-6">
         <div class="flex items-center justify-between gap-3">
@@ -283,10 +251,6 @@ watch(ticket, (t) => {
               <UBadge color="primary" variant="soft">{{ ticket?.status || '-' }}</UBadge>
             </div>
             <div class="space-y-1">
-              <p class="text-xs text-muted-500">Time Elapsed</p>
-              <p class="text-base text-gray-900 font-mono">{{ elapsedTime }}</p>
-            </div>
-            <div class="space-y-1">
               <p class="text-xs text-muted-500">Priority</p>
               <p class="text-base text-gray-900">{{ ticket?.priority || '-' }}</p>
             </div>
@@ -312,7 +276,12 @@ watch(ticket, (t) => {
             </div>
             <div class="space-y-1">
               <p class="text-xs text-muted-500">Category</p>
-              <p class="text-base text-gray-900">{{ ticket?.category?.name || '-' }}</p>
+              <p class="text-base text-gray-900">
+                <button v-if="ticket?.category?.id" @click.prevent="goToCategory(ticket.category.id)" class="text-gray-900 hover:underline">
+                  {{ ticket?.category?.name || '-' }}
+                </button>
+                <span v-else>{{ ticket?.category?.name || '-' }}</span>
+              </p>
             </div>
             <div class="space-y-1 sm:col-span-2">
               <p class="text-xs text-muted-500">Description</p>

@@ -17,6 +17,7 @@ interface _GlobalComponents {
   'CategoriesTable': typeof import("../../app/components/CategoriesTable.vue").default
   'Sidebar': typeof import("../../app/components/Sidebar.vue").default
   'SupervisorDashboard': typeof import("../../app/components/SupervisorDashboard.vue").default
+  'SurveysTable': typeof import("../../app/components/SurveysTable.vue").default
   'TechnicianTickets': typeof import("../../app/components/TechnicianTickets.vue").default
   'TicketComments': typeof import("../../app/components/TicketComments.vue").default
   'UsersTable': typeof import("../../app/components/UsersTable.vue").default
@@ -185,6 +186,7 @@ interface _GlobalComponents {
   'LazyCategoriesTable': LazyComponent<typeof import("../../app/components/CategoriesTable.vue").default>
   'LazySidebar': LazyComponent<typeof import("../../app/components/Sidebar.vue").default>
   'LazySupervisorDashboard': LazyComponent<typeof import("../../app/components/SupervisorDashboard.vue").default>
+  'LazySurveysTable': LazyComponent<typeof import("../../app/components/SurveysTable.vue").default>
   'LazyTechnicianTickets': LazyComponent<typeof import("../../app/components/TechnicianTickets.vue").default>
   'LazyTicketComments': LazyComponent<typeof import("../../app/components/TicketComments.vue").default>
   'LazyUsersTable': LazyComponent<typeof import("../../app/components/UsersTable.vue").default>

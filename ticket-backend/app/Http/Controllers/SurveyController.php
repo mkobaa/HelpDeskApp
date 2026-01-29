@@ -35,9 +35,22 @@ class SurveyController extends Controller
     }
 
 
-    public function getSurveys()
+    public function getSurveys(Request $request)
     {
-        $surveys = Survey::all();
+        $user = $request->user();
+
+        if ($user->role == 'technician') {
+            $surveys = Survey::whereHas('ticket', function ($query) use ($user) {
+                $query->where('assigned_tech_id', $user->id);
+            })->paginate(20);
+        } else if ($user->role == 'supervisor') {
+            $surveys = Survey::paginate(20);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
 
         return response()->json([
             'success' => true,

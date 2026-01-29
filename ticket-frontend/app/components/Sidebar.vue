@@ -10,7 +10,6 @@ const sidebarItems = computed(() => {
         { label: 'Users', to: '/admin/users' },
         { label: 'Categories', to: '/admin/categories' },
         { label: 'History', to: '/admin/history' },
-        { label: 'Settings', to: '/admin/settings' }
       ]
 
     case 'supervisor':
@@ -18,12 +17,14 @@ const sidebarItems = computed(() => {
         { label: 'Dashboard', to: '/supervisor' },
         { label: 'Tickets', to: '/supervisor/tickets' },
         { label: 'Reports', to: '/supervisor/reports'},
-        { label: 'Technicians', to: '/supervisor/technicians' }
+        { label: 'Technicians', to: '/supervisor/technicians' },
+        { label: 'Surveys', to: '/supervisor/surveys' }
       ]
 
     case 'technician':
       return [
-        { label: 'My Tickets', to: '/technician/tickets' }
+        { label: 'My Tickets', to: '/technician/tickets' },
+        { label: 'Surveys', to: '/technician/surveys' }
       ]
 
     case 'user':
