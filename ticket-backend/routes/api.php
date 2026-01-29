@@ -104,6 +104,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/reports/solution-time-trends', [ReportsController::class, 'solutionTimeTrends'])->middleware('supervisor');
     Route::get('/reports/export', [ReportsController::class, 'exportReport'])->middleware('supervisor');
     Route::get('/reports/export-pdf', [ReportsController::class, 'exportPdf'])->middleware('supervisor');
+
+
+    Route::get('/stats/number-of-users', [statsController::class, 'numberOfUsers'])->middleware('admin');
+    Route::get('/stats/number-of-categories', [statsController::class, 'numberOfCategories'])->middleware('admin');
+    Route::get('/stats/number-of-actions', [statsController::class, 'numberOfActions'])->middleware('admin');
+    
 });
 
 // Route::get('/sse/notifications', [NotificationController::class, 'sseNotifications']);

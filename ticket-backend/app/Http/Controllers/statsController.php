@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ticket;
+use App\Models\User;
+use App\Models\Category;
+use App\Models\TicketHistory;
 
 class statsController extends Controller
 {
@@ -48,6 +51,45 @@ class statsController extends Controller
                 'closed_tickets_count' => $closedTicketsCount
                 ]
           ]);
+    }
+
+
+    public function numberOfUsers(Request $request)
+    {
+        $userCount = User::count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'number_of_users' => $userCount
+            ]
+        ]);
+    }
+
+
+    public function numberOfCategories(Request $request)
+    {
+        $categoryCount = Category::count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'number_of_categories' => $categoryCount
+            ]
+        ]);
+    }
+
+
+    public function numberOfActions(Request $request)
+    {
+        $actionCount = TicketHistory::count();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'number_of_actions' => $actionCount
+            ]
+        ]);
     }
 
 }

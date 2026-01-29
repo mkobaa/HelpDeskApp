@@ -40,6 +40,11 @@ onNuxtReady(() => {
       {{ row.original.name }}
     </NuxtLink>
   </template>
+  <template #description-cell="{ row }">
+    <span>
+      {{ (row.original.description || '').length > 50 ? (row.original.description || '').slice(0,50) + '...' : (row.original.description || '') }}
+    </span>
+  </template>
 </UTable>
 
 </template>

@@ -6,9 +6,11 @@ const sidebarItems = computed(() => {
   switch (userRole.value) {
     case 'admin':
       return [
+        { label: 'Dashboard', to: '/admin' },
         { label: 'Users', to: '/admin/users' },
         { label: 'Categories', to: '/admin/categories' },
-        { label: 'History', to: '/admin/history' }
+        { label: 'History', to: '/admin/history' },
+        { label: 'Settings', to: '/admin/settings' }
       ]
 
     case 'supervisor':

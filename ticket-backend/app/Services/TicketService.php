@@ -20,24 +20,18 @@ class TicketService
     {
         $oldStatus = $ticket->status;
 
-        // 1. Update status
         $ticket->status = $newStatus;
         $ticket->save();
 
-        // 2. Notify submitter
         $this->notifySubmitter($ticket);
 
-        // 3. Log history
         $this->logStatusChange($ticket, $oldStatus, $newStatus, $actorId);
 
-        // 4. If closed → call YOUR service here
         if ($newStatus === 'closed') {
             $this->timeTrackingService->stopForTicket($ticket, $actorId);
 
-            // mark ticket as survey requested
             app(SurveyService::class)->requestSurveyForTicket($ticket);
 
-            // create a placeholder Survey row if none exists (use neutral defaults)
             if (! Survey::where('ticket_id', $ticket->id)->exists()) {
                 Survey::create([
                     'ticket_id' => $ticket->id,
