@@ -66,4 +66,11 @@ class TicketPolicy
     {
         return false;
     }
+
+
+    public function reassign(User $user, Ticket $ticket)
+    {
+        return in_array($user->role, ['supervisor', 'technician']);
+    }
+
 }

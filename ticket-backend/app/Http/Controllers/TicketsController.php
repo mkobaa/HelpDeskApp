@@ -27,7 +27,6 @@ class TicketsController extends Controller
 
     public function show(Ticket $ticket)
     {
-        // include attachments, technician and category (name) so frontend can display category name
         $ticket->load(['attachments', 'technician:id,username', 'category:id,name']);
         return response()->json([
             'success' => true,
@@ -88,6 +87,7 @@ class TicketsController extends Controller
 
     public function reassignTechnician(Request $request, Ticket $ticket, TechAssignementService $service) 
     {
+        
         $data = $request->validate([
             'technician_id' => 'required|integer|exists:users,id',
         ]);

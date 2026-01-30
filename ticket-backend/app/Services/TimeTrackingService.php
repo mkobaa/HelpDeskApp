@@ -18,14 +18,10 @@ class TimeTrackingService
         ]);
     }
 
-    /**
-     * Stop time tracking when ticket is closed
-     */
     public static function stopForTicket(Ticket $ticket, int $technicianId)
     {
         $tracking = $ticket->timeTracking;
 
-        // If no tracking row exists (maybe creation was skipped), create one
         if (! $tracking) {
             $startTime = $ticket->created_at ?? now();
             $tracking = TimeTracking::create([
@@ -35,7 +31,7 @@ class TimeTrackingService
         }
 
         if ($tracking->end_time !== null) {
-            return $tracking; // already closed
+            return $tracking; 
         }
 
         $endTime = now();

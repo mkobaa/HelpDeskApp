@@ -1,6 +1,5 @@
 <?php
 
-// app/Models/TimeTracking.php
 
 namespace App\Models;
 
@@ -8,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TimeTracking extends Model
 {
-    protected $table = 'time_tracking';   // VERY IMPORTANT
+    protected $table = 'time_tracking';
 
     protected $fillable = [
         'ticket_id',

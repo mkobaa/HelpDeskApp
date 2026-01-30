@@ -22,7 +22,6 @@ class NotificationStreamService
         echo "data: ok\n\n";
         flush();
 
-        // Send initial unread notifications once (DB used only for persistence + initial fetch)
         try {
             $query = $user->unreadNotifications();
 
@@ -51,16 +50,13 @@ class NotificationStreamService
                 flush();
             }
         } catch (\Throwable $e) {
-            // If initial DB fetch fails, continue to Redis subscription for realtime updates
         }
 
-        // Subscribe to Redis Pub/Sub for realtime notifications
         $channel = sprintf('notifications:%s', $user->id);
 
         try {
             Redis::subscribe([$channel], function ($message) {
                 if (connection_aborted()) {
-                    // Let the subscribe call end when connection is gone
                     exit;
                 }
 

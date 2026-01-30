@@ -11,6 +11,8 @@ export const getHistory = async (criteria = {}) => {
     if (criteria.status) params.append('status', criteria.status)
     if (criteria.priority) params.append('priority', criteria.priority)
     if (criteria.category_id) params.append('category_id', criteria.category_id)
+    if (criteria.page) params.append('page', String(criteria.page))
+    if (criteria.per_page) params.append('per_page', String(criteria.per_page))
 
     // Support legacy name parameter if passed as string, though unlikely given typescript usage elsewhere
     if (typeof criteria === 'string') {
@@ -34,14 +36,15 @@ export const getHistory = async (criteria = {}) => {
         }
     })
 
-    const raw = await response.json()
+    const raw = await response.json().catch(() => null)
     if (!response.ok) {
         throw raw
     }
+    if (criteria._raw) return raw
     // Support paginated API: { data: { data: [...] } }
     if (raw?.data?.data && Array.isArray(raw.data.data)) return raw.data.data
     if (Array.isArray(raw)) return raw
     if (Array.isArray(raw.data)) return raw.data
-    if (Array.isArray(raw.tickets)) return raw.tickets
+    if (Array.isArray(raw.logs)) return raw.logs
     return []
 }

@@ -15,7 +15,6 @@ class TicketHistory extends Model
         'notes'
     ];
 
-    // Add relationship to User (actor)
     public function user()
     {
         return $this->belongsTo(User::class, 'actor_id');

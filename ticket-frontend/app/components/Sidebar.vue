@@ -1,6 +1,21 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import { onNuxtReady } from '#imports'
+import { getProfile } from '~/api/users/profile'
 const userRole = useCookie('user_role')
+
+const { data: user, status, error, refresh } = await useAsyncData(
+  'current-user-sidebar',
+  async () => {
+    const raw = await getProfile()
+    return raw?.data || raw?.user || raw
+  },
+  { server: false, lazy: true, immediate: false }
+)
+
+onNuxtReady(() => {
+  refresh()
+})
 
 const sidebarItems = computed(() => {
   switch (userRole.value) {
@@ -92,7 +107,7 @@ const items = computed<NavigationMenuItem[][]>(() => {
         :avatar="{
           src: 'https://github.com/benjamincanac.png'
         }"
-        :label="collapsed ? undefined : 'Benjamin'"
+        :label="collapsed ? undefined : (user?.username || 'Profile')"
         color="neutral"
         variant="ghost"
         class="w-full"

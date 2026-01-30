@@ -144,7 +144,6 @@ const performAssign = async () => {
   assignLoading.value = true
   try {
     const techId = Number(selectedAssignTech.value)
-        console.log('About to send technician_id:', techId)   // 👈 add this
 
     if (ticket.value?.assigned_tech_id || ticket.value?.technician_id) {
       await reassignTechnician(ticketId.value, techId)

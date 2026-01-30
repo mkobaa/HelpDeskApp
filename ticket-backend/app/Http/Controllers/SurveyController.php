@@ -80,7 +80,6 @@ class SurveyController extends Controller
     {
         $user = auth()->user();
 
-        // tickets reference the submitter via `submitter_id`
         $surveys = Survey::whereHas('ticket', function ($query) use ($user) {
             $query->where('submitter_id', $user->id)->where('is_survey_completed', false);
         })->get();

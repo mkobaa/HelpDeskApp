@@ -9,6 +9,7 @@ use App\Models\Ticket;
 use App\Models\Category;
 use App\Models\TimeTracking;
 use App\Models\Survey;
+use App\Services\TicketHistoryService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -74,7 +75,6 @@ class DemoTicketSeeder extends Seeder
             $statusOptions = ['closed', 'resolved', 'in_progress', 'pending', 'open'];
             $status = $statusOptions[array_rand($statusOptions)];
 
-            // Assign a random technician (if available)
             $assignedTech = null;
             if (count($userIdsByRole['technician'])) {
                 $assignedTech = $userIdsByRole['technician'][array_rand($userIdsByRole['technician'])];
@@ -94,7 +94,8 @@ class DemoTicketSeeder extends Seeder
                 'is_survey_completed' => false,
             ]);
 
-            // resolution between 0 and 8 hours (0 to 480 minutes)
+            TicketHistoryService::log($ticket->id, 'ticket_created', $submitterId, 'Ticket created by seeder');
+
             $minutesToResolve = rand(0, 480);
             $resolvedAt = (clone $createdAt)->addMinutes($minutesToResolve);
             if ($resolvedAt->gt(Carbon::now())) {
@@ -112,7 +113,9 @@ class DemoTicketSeeder extends Seeder
                 'updated_at' => $resolvedAt,
             ]);
 
-            // Create a survey filled by the submitter with random ratings
+            $actorForTime = $assignedTech ?? $submitterId;
+            TicketHistoryService::log($ticket->id, 'time_tracking_created', $actorForTime, 'Time tracking created by seeder');
+
             Survey::create([
                 'ticket_id' => $ticket->id,
                 'satisfaction_rating' => rand(1,5),
@@ -123,11 +126,14 @@ class DemoTicketSeeder extends Seeder
                 'updated_at' => $resolvedAt,
             ]);
 
-            // Mark ticket as survey completed and set updated_at to resolved time
+            TicketHistoryService::log($ticket->id, 'survey_submitted', $submitterId, 'Survey created by seeder');
+
             $ticket->is_survey_sent = false;
             $ticket->is_survey_completed = true;
             $ticket->updated_at = $resolvedAt;
             $ticket->save();
+
+            TicketHistoryService::log($ticket->id, 'ticket_updated', $submitterId, 'Survey completed and ticket updated by seeder');
         }
     }
 }

@@ -77,7 +77,6 @@ class TicketAcceptanceController extends Controller
                 $technicianId = $pending->technician->id;
             }
         } else {
-            // If no pending acceptance, check if someone already accepted
             $accepted = TicketAcceptance::with('technician')
                 ->where('ticket_id', $ticketId)
                 ->where('is_accepted', 'accepted')

@@ -25,7 +25,6 @@ class TechAssignementService
             $ticket
         );
 
-        // generic history
         $this->logHistory(
             $ticket,
             'assignment_requested',
@@ -33,7 +32,6 @@ class TechAssignementService
             "Assignment requested for technician ID {$technician->id}"
         );
 
-        // generic notification
         $this->notifyUser(
             $technician,
             new TicketAssigned($ticket)
@@ -59,7 +57,6 @@ class TechAssignementService
             $ticket
         );
 
-        // generic history
         $this->logHistory(
             $ticket,
             'reassignment_requested',
@@ -67,7 +64,6 @@ class TechAssignementService
             "Reassignment requested for technician ID {$technician->id}"
         );
 
-        // generic notification
         $this->notifyUser(
             $technician,
             new TicketAssigned($ticket)

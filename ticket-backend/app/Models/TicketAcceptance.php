@@ -13,13 +13,11 @@ class TicketAcceptance extends Model
         'is_accepted',
     ];
 
-    // 👇 THIS is what is missing
     public function ticket()
     {
         return $this->belongsTo(Ticket::class);
     }
 
-    // Optional but recommended
     public function technician()
     {
         return $this->belongsTo(User::class, 'technician_id');

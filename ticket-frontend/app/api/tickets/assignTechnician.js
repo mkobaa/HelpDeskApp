@@ -53,8 +53,8 @@ export const reassignTechnician = async (ticketId, technicianId) => {
             Authorization: `Bearer ${bearer}`
         },
         body: JSON.stringify({
-            assigned_tech_id: technicianId
-        })
+                technician_id: technicianId
+            })
     })
 
     const raw = await response.json()
