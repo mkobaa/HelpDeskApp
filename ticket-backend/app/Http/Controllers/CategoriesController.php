@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
 use App\Models\Category;
 
 class CategoriesController extends Controller
@@ -21,11 +23,21 @@ class CategoriesController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:categories,name',
             'description' => 'nullable|string',
             'parent_category_id' => 'nullable|exists:categories,id',
         ]);
-        $category = Category::create($data);
+        try {
+            $category = Category::create($data);
+        } catch (QueryException $e) {
+            if (isset($e->errorInfo[0]) && $e->errorInfo[0] === '23505') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category with this name already exists',
+                ], 409);
+            }
+            throw $e;
+        }
         return response()->json([
             'success' => true,
             'data' => $category
@@ -42,12 +54,22 @@ class CategoriesController extends Controller
     public function update(Request $request, Category $category)
     {
         $data = $request->validate([
-            'name' => 'sometimes|string|max:255',
+            'name' => ['sometimes','string','max:255', Rule::unique('categories', 'name')->ignore($category->id)],
             'description' => 'nullable|string',
             'parent_category_id' => 'nullable|exists:categories,id',
         ]);
 
-        $category->update($data);
+        try {
+            $category->update($data);
+        } catch (QueryException $e) {
+            if (isset($e->errorInfo[0]) && $e->errorInfo[0] === '23505') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category with this name already exists',
+                ], 409);
+            }
+            throw $e;
+        }
 
         return response()->json([
             'success' => true,

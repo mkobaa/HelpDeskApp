@@ -37,9 +37,9 @@ const usersMap = computed(() => {
 
 const getActorName = (row: any) => {
   const orig = row?.original || {}
-  const id = orig.actor_id || orig.user_id || orig.causer_id || (orig.actor && orig.actor.id) || (orig.causer && orig.causer.id)
+  const id = orig.actor_id
   if (id != null) return usersMap.value[String(id)] || `User ${id}`
-  return orig.actor_username || orig.causer_username || orig.username || 'Unknown'
+  return orig.username
 }
 
 const extractMeta = (v: any) => {
@@ -104,7 +104,7 @@ onNuxtReady(() => {
     >
       <template #actor_username-cell="{ row }">
         <NuxtLink
-          :to="`/admin/users/${row.original.id}`"
+          :to="`/admin/users/${row.original.actor_id}`"
           class="text-primary underline hover:text-primary-600"
         >
           {{ getActorName(row) }}
